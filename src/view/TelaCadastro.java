@@ -1,11 +1,19 @@
 package view;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import util.NumericDocumentFilter;
 
 public class TelaCadastro extends JPanel {
+	private JTextField userInput;
+	private JTextField incomeInput;
+	private JTextField passwordInput;
+	private JTextField confirmPasswordInput;
+	private JButton registerButton;
+	
 	public TelaCadastro() {
 		setLayout(new GridBagLayout());
 		
@@ -23,23 +31,23 @@ public class TelaCadastro extends JPanel {
 		paragraph1.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		JLabel userLabel = new JLabel("Nome de usuário");
-		JTextField userInput = new JTextField(20);
+		userInput = new JTextField(20);
 		userInput.setMargin(new Insets(5, 10, 10, 5));
 		
 		JLabel incomeLabel = new JLabel("Saldo atual da sua conta");
-		JTextField incomeInput = new JTextField(20);
+		incomeInput = new JTextField(20);
 		incomeInput.setMargin(new Insets(5, 10, 10, 5));
 		((AbstractDocument) incomeInput.getDocument()).setDocumentFilter(new NumericDocumentFilter());
 		
 		JLabel passwordLabel = new JLabel("Senha");
-		JTextField passwordInput = new JPasswordField(20);
+		passwordInput = new JPasswordField(20);
 		passwordInput.setMargin(new Insets(5, 10, 10, 5));
 		
 		JLabel confirmPasswordLabel = new JLabel("Confirmar senha");
-		JTextField confirmPasswordInput = new JPasswordField(20);
+		confirmPasswordInput = new JPasswordField(20);
 		confirmPasswordInput.setMargin(new Insets(5, 10, 10, 5));
 		
-		JButton registerButton = new JButton("Cadastrar");
+		registerButton = new JButton("Cadastrar");
 		registerButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		registerButton.setPreferredSize(new Dimension(100, registerButton.getPreferredSize().height));
 		
@@ -95,5 +103,25 @@ public class TelaCadastro extends JPanel {
 		gbc.gridy = 10;
 		gbc.insets = new Insets(20, 0, 0, 0);
 		add(registerButton, gbc);
+	}
+	
+	public JTextField getUserInput() {
+		return userInput;
+	}
+	
+	public JTextField getIncomeInput() {
+		return incomeInput;
+	}
+	
+	public JTextField getPasswordInput() {
+		return passwordInput;
+	}
+	
+	public JTextField getConfirmPasswordInput() {
+		return confirmPasswordInput;
+	}
+	
+	public JButton getRegisterButton() {
+		return registerButton;
 	}
 }

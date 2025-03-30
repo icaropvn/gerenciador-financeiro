@@ -8,6 +8,7 @@ public class MainFrame extends JFrame {
 	private JPanel cardPanel;
 	private TelaLogin telaLogin;
 	private TelaCadastro telaCadastro;
+	private TelaPrincipal telaPrincipal;
 	
 	public MainFrame() {
 		cardLayout = new CardLayout();
@@ -20,10 +21,12 @@ public class MainFrame extends JFrame {
 		// instanciamento das telas
 		telaLogin = new TelaLogin();
 		telaCadastro = new TelaCadastro();
+		telaPrincipal = new TelaPrincipal();
 		
 		// adição das telas ao painel principal
 		cardPanel.add(telaLogin, "login");
 		cardPanel.add(telaCadastro, "cadastro");
+		cardPanel.add(telaPrincipal, "principal");
 		
 		add(cardPanel);
 		

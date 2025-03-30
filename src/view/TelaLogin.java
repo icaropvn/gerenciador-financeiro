@@ -5,6 +5,9 @@ import java.awt.event.*;
 import javax.swing.*;
 
 public class TelaLogin extends JPanel {
+	private JTextField userInput;
+	private JTextField passwordInput;
+	private JButton loginButton;
 	private JLabel createAccountLabel;
 	
 	public TelaLogin() {
@@ -24,14 +27,14 @@ public class TelaLogin extends JPanel {
 		paragraph1.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		
 		JLabel userLabel = new JLabel("Usuário");
-		JTextField userInput = new JTextField(20);
+		userInput = new JTextField(20);
 		userInput.setMargin(new Insets(5, 10, 10, 5));
 		
 		JLabel passwordLabel = new JLabel("Senha");
-		JTextField passwordInput = new JPasswordField(20);
+		passwordInput = new JPasswordField(20);
 		passwordInput.setMargin(new Insets(5, 10, 10, 5));
 		
-		JButton loginButton = new JButton("Entrar");
+		loginButton = new JButton("Entrar");
 		loginButton.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		loginButton.setPreferredSize(new Dimension(100, loginButton.getPreferredSize().height));
 		
@@ -83,6 +86,18 @@ public class TelaLogin extends JPanel {
 		gbc.gridy = 8;
 		gbc.insets = new Insets(0, 0, 0, 0);
 		add(createAccountLabel, gbc);
+	}
+	
+	public JTextField getUserInput() {
+		return userInput;
+	}
+	
+	public JTextField getPasswordInput() {
+		return passwordInput;
+	}
+	
+	public JButton getLoginButton() {
+		return loginButton;
 	}
 	
 	public void setCreateAccountLabelListener(MouseListener listener) {
