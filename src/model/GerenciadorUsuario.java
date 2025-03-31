@@ -29,4 +29,17 @@ public class GerenciadorUsuario {
 		Usuario usuario = usuariosCadastrados.get(nome);
 		return usuario != null ? usuario.getSenha().equals(senhaCriptografada) : false;
 	}
+	
+	// getters e setters
+	public void setUsuarioAtual(Usuario usuarioAtual) {
+		this.usuarioAtual = usuarioAtual;
+	}
+	
+	public Usuario getUsuarioAtual() {
+		return usuarioAtual;
+	}
+	
+	public Usuario getUsuario(String nome) {
+		return usuariosCadastrados.get(nome);
+	}
 }

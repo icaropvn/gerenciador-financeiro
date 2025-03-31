@@ -48,4 +48,8 @@ public class MainFrame extends JFrame {
 	public TelaCadastro getTelaCadastro() {
 		return telaCadastro;
 	}
+	
+	public TelaPrincipal getTelaPrincipal() {
+		return telaPrincipal;
+	}
 }

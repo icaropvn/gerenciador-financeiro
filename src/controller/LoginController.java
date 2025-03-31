@@ -1,23 +1,25 @@
 package controller;
 
+import java.text.DecimalFormat;
 import java.awt.event.*;
-
 import javax.swing.JOptionPane;
 
 import view.MainFrame;
 import view.TelaLogin;
+import view.TelaPrincipal;
 import model.GerenciadorUsuario;
-import util.CriptografarSenha;
 
 public class LoginController {
 	private MainFrame mainFrame;
 	private TelaLogin telaLogin;
 	private GerenciadorUsuario gerenciadorUsuario;
+	private TelaPrincipal telaPrincipal;
 	
-	public LoginController(MainFrame mainFrame, TelaLogin telaLogin, GerenciadorUsuario gerenciadorUsuario) {
+	public LoginController(MainFrame mainFrame, TelaLogin telaLogin, GerenciadorUsuario gerenciadorUsuario, TelaPrincipal telaPrincipal) {
 		this.mainFrame = mainFrame;
 		this.telaLogin = telaLogin;
 		this.gerenciadorUsuario = gerenciadorUsuario;
+		this.telaPrincipal = telaPrincipal;
 		
 		initControllers();
 	}
@@ -52,7 +54,15 @@ public class LoginController {
 			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+	
+		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
 		
-		// ir para tela principal
+		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
+		
+		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
+		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
+		telaPrincipal.setSaldo(saldo);
+		
+		mainFrame.mostrarTela("principal");
 	}
 }
