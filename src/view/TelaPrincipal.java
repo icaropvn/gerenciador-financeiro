@@ -7,6 +7,8 @@ import javax.swing.table.TableColumnModel;
 public class TelaPrincipal extends JPanel {
 	private JLabel saudacao;
 	private JLabel saldo;
+	private JButton botaoEditarCategorias;
+	private JButton botaoAdicionarTransacao;
 	
 	public TelaPrincipal() {
 		setLayout(new BorderLayout());
@@ -84,11 +86,11 @@ public class TelaPrincipal extends JPanel {
 		
 		JPanel containerBotoesCabecalho = new JPanel(new FlowLayout());
 		
-		JButton botaoEditarCategorias = new JButton("Editar categorias");
+		botaoEditarCategorias = new JButton("Editar categorias");
 		botaoEditarCategorias.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		containerBotoesCabecalho.add(botaoEditarCategorias);
 		
-		JButton botaoAdicionarTransacao = new JButton("Adicionar transação");
+		botaoAdicionarTransacao = new JButton("Adicionar transação");
 		botaoAdicionarTransacao.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		containerBotoesCabecalho.add(botaoAdicionarTransacao);
 		
@@ -194,5 +196,13 @@ public class TelaPrincipal extends JPanel {
 	
 	public void setSaldo(String saldo) {
 		this.saldo.setText(saldo);
+	}
+	
+	public JButton getBotaoEditarCategorias() {
+		return botaoEditarCategorias;
+	}
+	
+	public JButton getBotaoAdicionarTransacao() {
+		return botaoAdicionarTransacao;
 	}
 }

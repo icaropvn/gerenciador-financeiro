@@ -44,24 +44,28 @@ public class LoginController {
 		String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
 		String senha = telaLogin.getPasswordInput().getText().trim();
 		
-		if(nome.isEmpty() || senha.isEmpty()) {
-			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+//		if(nome.isEmpty() || senha.isEmpty()) {
+//			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		
+//		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
+//		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
+//			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		
+//		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
+//		
+//		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
+//		
+//		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
+//		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
+//		telaPrincipal.setSaldo(saldo);
 		
-		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
-		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
-			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-	
-		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
-		
-		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
-		
-		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
-		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
-		telaPrincipal.setSaldo(saldo);
+		/*
+		 * FACILITAR PARA TESTES
+		*/
 		
 		mainFrame.mostrarTela("principal");
 	}
