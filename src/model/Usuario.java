@@ -26,4 +26,12 @@ public class Usuario {
 	public double getSaldo() {
 		return saldo;
 	}
+	
+	public void setSaldo(double saldo) {
+		this.saldo = saldo;
+	}
+	
+	public void adicionarTransacao(Transacao novaTransacao) {
+		historicoTransacoes.add(novaTransacao);
+	}
 }

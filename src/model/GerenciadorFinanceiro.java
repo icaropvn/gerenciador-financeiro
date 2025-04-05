@@ -1,5 +1,13 @@
 package model;
 
 public class GerenciadorFinanceiro {
-	// responsável por calcular saldo e aplicar filtros nos dados
+	public GerenciadorFinanceiro(){}
+	
+	public void retirarSaldo(Usuario usuario, double despesa) {
+		usuario.setSaldo(usuario.getSaldo() - despesa);
+	}
+	
+	public void adicionarSaldo(Usuario usuario, double receita) {
+		usuario.setSaldo(usuario.getSaldo() + receita);
+	}
 }

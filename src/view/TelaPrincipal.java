@@ -1,14 +1,22 @@
 package view;
 
 import java.awt.*;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import java.time.format.DateTimeFormatter;
+
+import model.Transacao;
 
 public class TelaPrincipal extends JPanel {
 	private JLabel saudacao;
 	private JLabel saldo;
 	private JButton botaoEditarCategorias;
 	private JButton botaoAdicionarTransacao;
+	private JTable tabelaTransacoes;
 	
 	public TelaPrincipal() {
 		setLayout(new BorderLayout());
@@ -27,7 +35,7 @@ public class TelaPrincipal extends JPanel {
 		painelResumo.setBackground(Color.decode("#e0e0e0"));
 		painelResumo.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
 		
-		saudacao = new JLabel("Olá, icaropvn!");
+		saudacao = new JLabel("Olá, {user}!");
 		saudacao.setFont(new Font("SansSerif", Font.PLAIN, 20));
 		painelResumo.add(saudacao);
 		
@@ -42,7 +50,7 @@ public class TelaPrincipal extends JPanel {
 		labelSaldoAtual.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		painelResumo.add(labelSaldoAtual);
 		
-		saldo = new JLabel("R$ 45.890,74");
+		saldo = new JLabel("R$ 0,00");
 		saldo.setFont(new Font("SansSerif", Font.BOLD, 28));
 		painelResumo.add(saldo);
 		
@@ -51,7 +59,7 @@ public class TelaPrincipal extends JPanel {
 		labelTotalDespesas.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
 		painelResumo.add(labelTotalDespesas);
 		
-		JLabel despesas = new JLabel("R$ 720,81");
+		JLabel despesas = new JLabel("R$ 0,00");
 		despesas.setFont(new Font("SansSerif", Font.BOLD, 18));
 		despesas.setForeground(Color.decode("#dd4b4b"));
 		despesas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
@@ -62,7 +70,7 @@ public class TelaPrincipal extends JPanel {
 		labelTotalReceitas.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 		painelResumo.add(labelTotalReceitas);
 		
-		JLabel receitas = new JLabel("R$ 940,02");
+		JLabel receitas = new JLabel("R$ 0,00");
 		receitas.setFont(new Font("SansSerif", Font.BOLD, 18));
 		receitas.setForeground(Color.decode("#5c7bed"));
 		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
@@ -161,12 +169,10 @@ public class TelaPrincipal extends JPanel {
 		
 		String[] colunasTabela = {"Data", "Valor", "Descrição", "Categoria", "Classificação"};
 		
-		Object[][] dados = {
-			    {"26/04/2025", "R$69,99", "Almoço no shopping", "Alimentação", "Despesa"},
-			    {"31/01/2025", "R$1350,00", "Salário", "Salário", "Receita"}
-		};
+		Object[][] dados = {};
 		
-		JTable tabelaTransacoes = new JTable(dados, colunasTabela);
+		DefaultTableModel modeloTabelaTransacoes = new DefaultTableModel(dados, colunasTabela);
+		tabelaTransacoes = new JTable(modeloTabelaTransacoes);
 		tabelaTransacoes.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
 		tabelaTransacoes.getTableHeader().setBackground(Color.decode("#D0D7FF"));
 		tabelaTransacoes.getTableHeader().setOpaque(true);
@@ -204,5 +210,30 @@ public class TelaPrincipal extends JPanel {
 	
 	public JButton getBotaoAdicionarTransacao() {
 		return botaoAdicionarTransacao;
+	}
+	
+	// outros métodos
+	public void adicionarTransacaoTabela(Transacao novaTransacao) {
+		String classificacao = novaTransacao.getClassificacao();
+		
+		DecimalFormatSymbols modeloSimbolosValor = new DecimalFormatSymbols();
+		modeloSimbolosValor.setDecimalSeparator(',');
+		DecimalFormat formatadorDecimal = new DecimalFormat("0.00", modeloSimbolosValor);
+		String valor = "R$" + formatadorDecimal.format(novaTransacao.getValor());
+		
+		String categoria = novaTransacao.getCategoria().getDescricao();
+		DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		String data = novaTransacao.getData().format(formatadorData);
+		String descricao = novaTransacao.getDescricao();
+		
+		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
+		modeloTabela.insertRow(0, new Object[]{data, valor, descricao, categoria, classificacao});
+		
+		tabelaTransacoes.revalidate();
+		tabelaTransacoes.repaint();
+	}
+	
+	public void atualizarSaldo(String novoSaldo) {
+		saldo.setText("R$ " + novoSaldo);
 	}
 }

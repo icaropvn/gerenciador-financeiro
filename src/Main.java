@@ -9,6 +9,7 @@ public class Main {
 		// instanciamento das classes de dados
 		GerenciadorUsuario gerenciadorUsuario = new GerenciadorUsuario();
 		GerenciadorCategorias gerenciadorCategorias = new GerenciadorCategorias();
+		GerenciadorFinanceiro gerenciadorFinanceiro = new GerenciadorFinanceiro();
 		
 		// instanciamento do frame principal da aplicação
 		MainFrame mainFrame = new MainFrame();
@@ -20,8 +21,9 @@ public class Main {
 		// instanciamento dos controllers das telas
 		LoginController loginController = new LoginController(mainFrame, mainFrame.getTelaLogin(), gerenciadorUsuario, mainFrame.getTelaPrincipal());
 		CadastroController cadastroController = new CadastroController(mainFrame, mainFrame.getTelaCadastro(), gerenciadorUsuario);
-		PrincipalController principalController = new PrincipalController(mainFrame.getTelaPrincipal(), telaCategorias, telaTransacoes);
+		PrincipalController principalController = new PrincipalController(mainFrame.getTelaPrincipal(), telaCategorias, telaTransacoes, gerenciadorCategorias);
 		CategoriasController categoriasController = new CategoriasController(telaCategorias, gerenciadorCategorias);
+		TransacoesController transacoesController = new TransacoesController(telaTransacoes, mainFrame.getTelaPrincipal(), gerenciadorUsuario, gerenciadorCategorias, gerenciadorFinanceiro);
 		
 		mainFrame.setVisible(true);
 	}

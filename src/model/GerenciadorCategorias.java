@@ -9,7 +9,6 @@ import javax.swing.JTextField;
 
 public class GerenciadorCategorias {
 	private List<Categoria> listaCategorias;
-	private List<Categoria> listCategoriasTemporaria;
 	private int proximoCodigoCategoria = 1;
 	
 	public enum TipoVerificacao {
@@ -18,7 +17,6 @@ public class GerenciadorCategorias {
 	
 	public GerenciadorCategorias() {
 		listaCategorias = new ArrayList<>();
-		listCategoriasTemporaria = new ArrayList<>();
 	}
 	
 	public void adicionarCategoria(String descCategoria) {
@@ -66,9 +64,27 @@ public class GerenciadorCategorias {
 		return false;
 	}
 	
+	public boolean isThereCategoria(String categoria) {
+		for(Categoria categoriaLista : listaCategorias) {
+			if(categoriaLista.getDescricao().equals(categoria))
+				return true;
+		}
+		
+		return false;
+	}
+	
 	// getters e setters
 	public List<Categoria> getListaCategorias() {
 		return listaCategorias;
+	}
+	
+	public Categoria getInstanciaCategoria(String descricao) {
+		for(Categoria categoria : listaCategorias) {
+			if(categoria.getDescricao().equals(descricao))
+				return categoria;
+		}
+		
+		return null;
 	}
 	
 	private int getProximoCodigo() {
