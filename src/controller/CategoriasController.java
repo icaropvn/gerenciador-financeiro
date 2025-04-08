@@ -9,20 +9,33 @@ import javax.swing.JTextField;
 
 import model.GerenciadorCategorias;
 import model.GerenciadorCategorias.TipoVerificacao;
+import model.GerenciadorUsuario;
 import util.CapitalizeString;
 import view.TelaEditarCategorias;
+import view.TelaPrincipal;
+
+
+
+import java.util.ArrayList;
+import model.Categoria;
+
+
 
 public class CategoriasController {
 	private TelaEditarCategorias view;
 	private GerenciadorCategorias gerenciador;
+	private GerenciadorUsuario gerenciadorUsuario;
+	private TelaPrincipal telaPrincipal;
 	
 	private JTextField inputCategoriaEdicao;
 	private JButton botaoEditarEdicao;
 	private JButton botaoExcluirEdicao;
 	
-	public CategoriasController(TelaEditarCategorias view, GerenciadorCategorias gerenciador) {
+	public CategoriasController(TelaEditarCategorias view, GerenciadorCategorias gerenciador, GerenciadorUsuario gerenciadorUsuario, TelaPrincipal telaPrincipal) {
 		this.view = view;
 		this.gerenciador = gerenciador;
+		this.gerenciadorUsuario = gerenciadorUsuario;
+		this.telaPrincipal = telaPrincipal;
 		
 		initControllers();
 	}
@@ -64,15 +77,40 @@ public class CategoriasController {
 			JOptionPane.showMessageDialog(view, "Essa categoria já está cadastrada.", "Erro ao adicionar categoria", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
-
+		
+		view.getAdicionarCategoriaInput().setText("");
 		gerenciador.adicionarCategoria(novaCategoria);
 		view.atualizarListaAdicao(novaCategoria, getListenerBotaoEditar(), getListenerBotaoExcluir());
+		telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
 	}
 	
+	// TESTE TEMPORARIO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//	public void validarAdicaoCategoria() {
+//		ArrayList<String> categorias = new ArrayList<>();
+//		
+//		categorias.add("Alimentação");
+//		categorias.add("Transporte");
+//		categorias.add("Lazer");
+//		categorias.add("Educação");
+//		categorias.add("Salário");
+//
+//		for(String categoria : categorias) {
+//			gerenciador.adicionarCategoria(categoria);
+//			view.atualizarListaAdicao(categoria, getListenerBotaoEditar(), getListenerBotaoExcluir());
+//			telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
+//		}
+//	}
+	
 	public void validarRemocaoCategoria(JButton botaoExcluir) {
-		int confirmarExclusao = JOptionPane.showConfirmDialog(view, "Tem certeza que deseja excluir essa categoria?", "Confirmação de exclusão de categoria", JOptionPane.YES_NO_OPTION);
-		
 		// validar se tem alguma transação com essa categoria antes de remover
+		boolean existeTransacoes = gerenciadorUsuario.getUsuarioAtual().existeTransacaoComCategoria((String)botaoExcluir.getClientProperty("categoria"));
+		
+		if(existeTransacoes) {
+			JOptionPane.showMessageDialog(view, "Ops! Parece que existe transações que utilizam essa categoria. Ela não pode ser removida.", "Erro ao remover categoria", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		int confirmarExclusao = JOptionPane.showConfirmDialog(view, "Tem certeza que deseja excluir essa categoria?", "Confirmação de exclusão de categoria", JOptionPane.YES_NO_OPTION);
 		
 		if(confirmarExclusao == JOptionPane.YES_OPTION) {
 			String categoriaRemover = (String)botaoExcluir.getClientProperty("categoria");

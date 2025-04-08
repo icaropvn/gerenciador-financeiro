@@ -9,6 +9,8 @@ import view.TelaLogin;
 import view.TelaPrincipal;
 import model.GerenciadorUsuario;
 
+import model.Usuario;
+
 public class LoginController {
 	private MainFrame mainFrame;
 	private TelaLogin telaLogin;
@@ -41,27 +43,30 @@ public class LoginController {
 	}
 	
 	public void validarLogin() {
-		String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
-		String senha = telaLogin.getPasswordInput().getText().trim();
+//		String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
+//		String senha = telaLogin.getPasswordInput().getText().trim();
+//		
+//		if(nome.isEmpty() || senha.isEmpty()) {
+//			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		
+//		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
+//		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
+//			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		
+//		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
+//		
+//		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
+//		
+//		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
+//		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
+//		telaPrincipal.setSaldo(saldo);
 		
-		if(nome.isEmpty() || senha.isEmpty()) {
-			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
-		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
-			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
-		
-		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
-		
-		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
-		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
-		telaPrincipal.setSaldo(saldo);
+//		TESTE!!!!!!!!!!!!!!
+		gerenciadorUsuario.setUsuarioAtual(new Usuario("sirso", "1234", 110000000));
 		
 		mainFrame.mostrarTela("principal");
 	}

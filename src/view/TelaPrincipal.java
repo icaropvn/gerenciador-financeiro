@@ -8,14 +8,26 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
+import model.Categoria;
 import model.Transacao;
+import util.RegExData;
+import util.RenderizadorCelulaTabelaCustomizado;
 
 public class TelaPrincipal extends JPanel {
 	private JLabel saudacao;
 	private JLabel saldo;
+	private JLabel despesas;
+	private JLabel receitas;
 	private JButton botaoEditarCategorias;
 	private JButton botaoAdicionarTransacao;
+	private JTextField inputDataInicial;
+	private JTextField inputDataFinal;
+	private JComboBox<String> selectClassificacao;
+	private JComboBox<String> selectCategoria;
+	private JButton botaoAplicarFiltros;
+	private JButton botaoLimparFiltros;
 	private JTable tabelaTransacoes;
 	
 	public TelaPrincipal() {
@@ -59,7 +71,7 @@ public class TelaPrincipal extends JPanel {
 		labelTotalDespesas.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
 		painelResumo.add(labelTotalDespesas);
 		
-		JLabel despesas = new JLabel("R$ 0,00");
+		despesas = new JLabel("R$ 0,00");
 		despesas.setFont(new Font("SansSerif", Font.BOLD, 18));
 		despesas.setForeground(Color.decode("#dd4b4b"));
 		despesas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
@@ -70,7 +82,7 @@ public class TelaPrincipal extends JPanel {
 		labelTotalReceitas.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 		painelResumo.add(labelTotalReceitas);
 		
-		JLabel receitas = new JLabel("R$ 0,00");
+		receitas = new JLabel("R$ 0,00");
 		receitas.setFont(new Font("SansSerif", Font.BOLD, 18));
 		receitas.setForeground(Color.decode("#5c7bed"));
 		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
@@ -119,22 +131,24 @@ public class TelaPrincipal extends JPanel {
 		labelDataInicial.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		inputsFiltros.add(labelDataInicial);
 		
-		JTextField inputDataInicial = new JTextField(8);
+		inputDataInicial = new JTextField(8);
+		((javax.swing.text.AbstractDocument)inputDataInicial.getDocument()).setDocumentFilter(new RegExData());
 		inputsFiltros.add(inputDataInicial);
 		
 		JLabel labelDataFinal = new JLabel("Até:");
 		labelDataFinal.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		inputsFiltros.add(labelDataFinal);
 		
-		JTextField inputDataFinal = new JTextField(8);
+		inputDataFinal = new JTextField(8);
+		((javax.swing.text.AbstractDocument)inputDataFinal.getDocument()).setDocumentFilter(new RegExData());
 		inputsFiltros.add(inputDataFinal);
 		
-		JComboBox<String> selectClassificacao = new JComboBox<>(new String[]{"Classificação"});
+		selectClassificacao = new JComboBox<>(new String[]{"Classificação", "Receita", "Despesa"});
 		selectClassificacao.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		selectClassificacao.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 		inputsFiltros.add(selectClassificacao);
 		
-		JComboBox<String> selectCategoria = new JComboBox<>(new String[]{"Categoria"});
+		selectCategoria = new JComboBox<>(new String[]{"Categoria"});
 		selectCategoria.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		selectCategoria.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
 		inputsFiltros.add(selectCategoria);
@@ -143,11 +157,11 @@ public class TelaPrincipal extends JPanel {
 		
 		JPanel containerBotoesFiltros = new JPanel(new FlowLayout());
 		
-		JButton botaoLimparFiltros = new JButton("Limpar filtros");
+		botaoLimparFiltros = new JButton("Limpar filtros");
 		botaoLimparFiltros.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		containerBotoesFiltros.add(botaoLimparFiltros);
 		
-		JButton botaoAplicarFiltros = new JButton("Aplicar filtros");
+		botaoAplicarFiltros = new JButton("Aplicar filtros");
 		botaoAplicarFiltros.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		containerBotoesFiltros.add(botaoAplicarFiltros);
 		
@@ -173,6 +187,7 @@ public class TelaPrincipal extends JPanel {
 		
 		DefaultTableModel modeloTabelaTransacoes = new DefaultTableModel(dados, colunasTabela);
 		tabelaTransacoes = new JTable(modeloTabelaTransacoes);
+		tabelaTransacoes.getColumnModel().getColumn(4).setCellRenderer(new RenderizadorCelulaTabelaCustomizado());
 		tabelaTransacoes.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
 		tabelaTransacoes.getTableHeader().setBackground(Color.decode("#D0D7FF"));
 		tabelaTransacoes.getTableHeader().setOpaque(true);
@@ -204,6 +219,14 @@ public class TelaPrincipal extends JPanel {
 		this.saldo.setText(saldo);
 	}
 	
+	public void setDespesasIntervalo(String despesas) {
+		this.despesas.setText(despesas);
+	}
+	
+	public void setReceitasIntervalo(String receitas) {
+		this.receitas.setText(receitas);
+	}
+	
 	public JButton getBotaoEditarCategorias() {
 		return botaoEditarCategorias;
 	}
@@ -212,7 +235,41 @@ public class TelaPrincipal extends JPanel {
 		return botaoAdicionarTransacao;
 	}
 	
+	public JTextField getInputDataInicial() {
+		return inputDataInicial;
+	}
+	
+	public JTextField getInputDataFinal() {
+		return inputDataFinal;
+	}
+	
+	public JComboBox getSelectClassificacao() {
+		return selectClassificacao;
+	}
+	
+	public JComboBox getSelectCategoria() {
+		return selectCategoria;
+	}
+	
+	public JButton getBotaoLimparFiltros() {
+		return botaoLimparFiltros;
+	}
+	
+	public JButton getBotaoAplicarFiltros() {
+		return botaoAplicarFiltros;
+	}
+	
 	// outros métodos
+	public void atualizarFiltroCategorias(List<Categoria> listaCategorias) {
+		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
+		modeloSelectCategoria.addElement("Categoria");
+		for(Categoria categoria : listaCategorias) {
+			modeloSelectCategoria.addElement(categoria.getDescricao());
+		}
+		
+		selectCategoria.setModel(modeloSelectCategoria);
+	}
+	
 	public void adicionarTransacaoTabela(Transacao novaTransacao) {
 		String classificacao = novaTransacao.getClassificacao();
 		
@@ -235,5 +292,31 @@ public class TelaPrincipal extends JPanel {
 	
 	public void atualizarSaldo(String novoSaldo) {
 		saldo.setText("R$ " + novoSaldo);
+	}
+	
+	public void substituirTabelaFiltrada(Object[][] transacoesFiltradas) {
+		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
+
+	    modeloTabela.setRowCount(0);
+
+	    for (Object[] linha : transacoesFiltradas) {
+	        modeloTabela.addRow(linha);
+	    }
+	    
+	    tabelaTransacoes.revalidate();
+	    tabelaTransacoes.repaint();
+	}
+	
+	public void limparFiltrosTabelaTransacoes(Object[][] transacoesSemFiltro) {
+		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
+
+	    modeloTabela.setRowCount(0);
+
+	    for (Object[] linha : transacoesSemFiltro) {
+	        modeloTabela.addRow(linha);
+	    }
+	    
+	    tabelaTransacoes.revalidate();
+	    tabelaTransacoes.repaint();
 	}
 }

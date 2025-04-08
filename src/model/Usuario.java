@@ -31,7 +31,20 @@ public class Usuario {
 		this.saldo = saldo;
 	}
 	
+	public ArrayList<Transacao> getHistoricoTransacoes() {
+		return historicoTransacoes;
+	}
+	
 	public void adicionarTransacao(Transacao novaTransacao) {
-		historicoTransacoes.add(novaTransacao);
+		historicoTransacoes.add(0, novaTransacao);
+	}
+	
+	public boolean existeTransacaoComCategoria(String categoria) {
+		for(Transacao transacao : historicoTransacoes) {
+			if(transacao.getCategoria().getDescricao().equals(categoria))
+				return true;
+		}
+		
+		return false;
 	}
 }
