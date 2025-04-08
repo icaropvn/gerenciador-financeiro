@@ -1,9 +1,8 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.swing.JOptionPane;
 
 import util.CriptografarSenha;
 
@@ -31,6 +30,11 @@ public class GerenciadorUsuario {
 	}
 	
 	// getters e setters
+	public ArrayList<Usuario> getUsuariosCadastrados() {
+		ArrayList<Usuario> listaUsuarios = new ArrayList<>(usuariosCadastrados.values());
+		return listaUsuarios;
+	}
+	
 	public void setUsuarioAtual(Usuario usuarioAtual) {
 		this.usuarioAtual = usuarioAtual;
 	}

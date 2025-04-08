@@ -8,6 +8,7 @@ import javax.swing.text.*;
 import util.NumericDocumentFilter;
 
 public class TelaCadastro extends JPanel {
+	private JButton botaoVoltar;
 	private JTextField userInput;
 	private JTextField incomeInput;
 	private JTextField passwordInput;
@@ -15,12 +16,20 @@ public class TelaCadastro extends JPanel {
 	private JButton registerButton;
 	
 	public TelaCadastro() {
-		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
 		
 		initComponents();
 	}
 	
 	public void initComponents() {
+		JPanel containerBotaoVoltar = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 15));
+		
+		botaoVoltar = new JButton("Voltar");
+		
+		containerBotaoVoltar.add(botaoVoltar);
+		
+		JPanel painelPrincipal = new JPanel(new GridBagLayout());
+		
 		JLabel heading = new JLabel("<html><body style=\"text-align: center;\">Vamos criar a sua conta!</body></html>");
 		heading.setVerticalAlignment(JLabel.CENTER);
 		heading.setFont(new Font("SansSerif", Font.PLAIN, 24));
@@ -53,56 +62,63 @@ public class TelaCadastro extends JPanel {
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridy = 0;
-		add(heading, gbc);
+		painelPrincipal.add(heading, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 1;
-		add(paragraph1, gbc);
+		painelPrincipal.add(paragraph1, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 2;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(20, 20, 5, 0);
-		add(userLabel, gbc);
+		painelPrincipal.add(userLabel, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 3;
-		add(userInput, gbc);
+		painelPrincipal.add(userInput, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 4;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(20, 20, 5, 0);
-		add(incomeLabel, gbc);
+		painelPrincipal.add(incomeLabel, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 5;
-		add(incomeInput, gbc);
+		painelPrincipal.add(incomeInput, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 6;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(10, 20, 5, 0);
-		add(passwordLabel, gbc);
+		painelPrincipal.add(passwordLabel, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 7;
-		add(passwordInput, gbc);
+		painelPrincipal.add(passwordInput, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 8;
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.insets = new Insets(10, 20, 5, 0);
-		add(confirmPasswordLabel, gbc);
+		painelPrincipal.add(confirmPasswordLabel, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 9;
-		add(confirmPasswordInput, gbc);
+		painelPrincipal.add(confirmPasswordInput, gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.gridy = 10;
 		gbc.insets = new Insets(20, 0, 0, 0);
-		add(registerButton, gbc);
+		painelPrincipal.add(registerButton, gbc);
+		
+		add(containerBotaoVoltar, BorderLayout.NORTH);
+		add(painelPrincipal, BorderLayout.CENTER);
+	}
+	
+	public JButton getBotaoVoltar() {
+		return botaoVoltar;
 	}
 	
 	public JTextField getUserInput() {

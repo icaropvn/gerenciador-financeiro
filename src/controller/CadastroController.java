@@ -21,6 +21,17 @@ public class CadastroController {
 	}
 	
 	public void initControllers() {
+		telaCadastro.getBotaoVoltar().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				telaCadastro.getUserInput().setText("");
+				telaCadastro.getIncomeInput().setText("");
+				telaCadastro.getPasswordInput().setText("");
+				telaCadastro.getConfirmPasswordInput().setText("");
+				mainFrame.mostrarTela("login");
+			}
+		});
+		
 		telaCadastro.getRegisterButton().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -59,6 +70,11 @@ public class CadastroController {
 		
 		Usuario novoUsuario = new Usuario(nome, senhaCriptografada, salarioDouble);
 		gerenciadorUsuario.adicionarUsuario(novoUsuario);
+		
+		telaCadastro.getUserInput().setText("");
+		telaCadastro.getIncomeInput().setText("");
+		telaCadastro.getPasswordInput().setText("");
+		telaCadastro.getConfirmPasswordInput().setText("");
 		
 		mainFrame.mostrarTela("login");
 		JOptionPane.showMessageDialog(mainFrame, "Sua conta foi criada com sucesso!", "Cadastro realizado", JOptionPane.INFORMATION_MESSAGE);

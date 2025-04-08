@@ -20,6 +20,8 @@ public class TelaPrincipal extends JPanel {
 	private JLabel saldo;
 	private JLabel despesas;
 	private JLabel receitas;
+	private JButton botaoSair;
+	
 	private JButton botaoEditarCategorias;
 	private JButton botaoAdicionarTransacao;
 	private JTextField inputDataInicial;
@@ -42,9 +44,13 @@ public class TelaPrincipal extends JPanel {
 	}
 	
 	public void initPainelResumo() {
+		JPanel painelRaiz = new JPanel(new BorderLayout());
+		painelRaiz.setBackground(Color.decode("#e0e0e0"));
+		painelRaiz.setOpaque(true);
+		
 		JPanel painelResumo = new JPanel();
+		painelResumo.setOpaque(false);
 		painelResumo.setLayout(new BoxLayout(painelResumo, BoxLayout.Y_AXIS));
-		painelResumo.setBackground(Color.decode("#e0e0e0"));
 		painelResumo.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
 		
 		saudacao = new JLabel("Olá, {user}!");
@@ -88,7 +94,18 @@ public class TelaPrincipal extends JPanel {
 		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 		painelResumo.add(receitas);
 		
-		add(painelResumo, BorderLayout.WEST);
+		JPanel containerBotaoSair = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+		containerBotaoSair.setOpaque(false);
+		
+		botaoSair = new JButton("Sair");
+		botaoSair.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		botaoSair.setPreferredSize(new Dimension(120, botaoSair.getPreferredSize().height));
+		
+		containerBotaoSair.add(botaoSair);
+		
+		painelRaiz.add(painelResumo, BorderLayout.CENTER);
+		painelRaiz.add(containerBotaoSair, BorderLayout.SOUTH);
+		add(painelRaiz, BorderLayout.WEST);
 	}
 	
 	public void initPainelPrincipal() {
@@ -227,6 +244,10 @@ public class TelaPrincipal extends JPanel {
 		this.receitas.setText(receitas);
 	}
 	
+	public JButton getBotaoSair() {
+		return botaoSair;
+	}
+	
 	public JButton getBotaoEditarCategorias() {
 		return botaoEditarCategorias;
 	}
@@ -294,25 +315,12 @@ public class TelaPrincipal extends JPanel {
 		saldo.setText("R$ " + novoSaldo);
 	}
 	
-	public void substituirTabelaFiltrada(Object[][] transacoesFiltradas) {
+	public void substituirTabelaTransacoes(Object[][] transacoes) {
 		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
 
 	    modeloTabela.setRowCount(0);
-
-	    for (Object[] linha : transacoesFiltradas) {
-	        modeloTabela.addRow(linha);
-	    }
 	    
-	    tabelaTransacoes.revalidate();
-	    tabelaTransacoes.repaint();
-	}
-	
-	public void limparFiltrosTabelaTransacoes(Object[][] transacoesSemFiltro) {
-		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
-
-	    modeloTabela.setRowCount(0);
-
-	    for (Object[] linha : transacoesSemFiltro) {
+	    for (Object[] linha : transacoes) {
 	        modeloTabela.addRow(linha);
 	    }
 	    

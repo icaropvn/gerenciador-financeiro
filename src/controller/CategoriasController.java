@@ -10,6 +10,7 @@ import javax.swing.JTextField;
 import model.GerenciadorCategorias;
 import model.GerenciadorCategorias.TipoVerificacao;
 import model.GerenciadorUsuario;
+import model.Usuario;
 import util.CapitalizeString;
 import view.TelaEditarCategorias;
 import view.TelaPrincipal;
@@ -103,7 +104,15 @@ public class CategoriasController {
 	
 	public void validarRemocaoCategoria(JButton botaoExcluir) {
 		// validar se tem alguma transação com essa categoria antes de remover
-		boolean existeTransacoes = gerenciadorUsuario.getUsuarioAtual().existeTransacaoComCategoria((String)botaoExcluir.getClientProperty("categoria"));
+		ArrayList<Usuario> listaUsuarios = gerenciadorUsuario.getUsuariosCadastrados();
+		boolean existeTransacoes = false;
+		
+		for(Usuario usuario : listaUsuarios) {
+			existeTransacoes = usuario.existeTransacaoComCategoria((String)botaoExcluir.getClientProperty("categoria"));
+			
+			if(existeTransacoes)
+				break;
+		}
 		
 		if(existeTransacoes) {
 			JOptionPane.showMessageDialog(view, "Ops! Parece que existe transações que utilizam essa categoria. Ela não pode ser removida.", "Erro ao remover categoria", JOptionPane.ERROR_MESSAGE);

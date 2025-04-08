@@ -1,6 +1,5 @@
 package controller;
 
-import java.awt.event.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -9,8 +8,11 @@ import java.time.format.DateTimeParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.awt.event.*;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
+import view.MainFrame;
 import view.TelaPrincipal;
 import view.TelaEditarCategorias;
 import view.TelaAdicionarTransacao;
@@ -19,6 +21,7 @@ import model.GerenciadorFinanceiro;
 import model.GerenciadorUsuario;
 
 public class PrincipalController {
+	private MainFrame mainFrame;
 	private TelaPrincipal view;
 	private TelaEditarCategorias telaCategorias;
 	private TelaAdicionarTransacao telaTransacao;
@@ -26,7 +29,8 @@ public class PrincipalController {
 	private GerenciadorFinanceiro gerenciadorFinanceiro;
 	private GerenciadorUsuario gerenciadorUsuario;
 	
-	public PrincipalController(TelaPrincipal telaPrincipal, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
+	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
+		this.mainFrame = mainFrame;
 		this.view = telaPrincipal;
 		this.telaCategorias = telaCategorias;
 		this.telaTransacao = telaTransacao;
@@ -38,6 +42,13 @@ public class PrincipalController {
 	}
 	
 	public void initControllers() {
+		view.getBotaoSair().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				confirmarSaida();
+			}
+		});
+		
 		view.getBotaoEditarCategorias().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -68,6 +79,15 @@ public class PrincipalController {
 		});
 	}
 	
+	public void confirmarSaida() {
+		int confirmarSaida = JOptionPane.showConfirmDialog(view, "Tem certeza que deseja sair da sua conta?", "Confirmação de saída", JOptionPane.YES_NO_OPTION);
+		
+		if(confirmarSaida == JOptionPane.YES_OPTION) {
+			gerenciadorUsuario.setUsuarioAtual(null);				
+			mainFrame.mostrarTela("login");
+		}
+	}
+	
 	public void mostrarTelaEditarCategorias() {
 		telaCategorias.setVisible(true);
 	}
@@ -80,7 +100,7 @@ public class PrincipalController {
 		
 		// retornar tabela ao estado original (mostrar todas as transações)
 		Object[][] transacoesSemFiltro = gerenciadorFinanceiro.retirarFiltros(gerenciadorUsuario.getUsuarioAtual());
-		view.limparFiltrosTabelaTransacoes(transacoesSemFiltro);
+		view.substituirTabelaTransacoes(transacoesSemFiltro);
 		
 		// redefinir resumo de despesas e receitas
 		gerenciadorFinanceiro.setDespesasIntervaloFiltrado(0);
@@ -143,7 +163,7 @@ public class PrincipalController {
 		
 		// atualiza tabela na tela com as transações filtradas
 		Object[][] transacoesFiltradas = gerenciadorFinanceiro.aplicarFiltros(gerenciadorUsuario.getUsuarioAtual(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
-		view.substituirTabelaFiltrada(transacoesFiltradas);
+		view.substituirTabelaTransacoes(transacoesFiltradas);
 		
 		// atualiza resumo de despesas e receitas no intervalo filtrado
 		double despesasIntervalo = gerenciadorFinanceiro.getDespesasIntervaloFiltrado();
