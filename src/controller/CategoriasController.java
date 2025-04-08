@@ -1,7 +1,8 @@
 package controller;
 
-import java.awt.event.*;
+import java.util.ArrayList;
 
+import java.awt.event.*;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -14,13 +15,6 @@ import model.Usuario;
 import util.CapitalizeString;
 import view.TelaEditarCategorias;
 import view.TelaPrincipal;
-
-
-
-import java.util.ArrayList;
-import model.Categoria;
-
-
 
 public class CategoriasController {
 	private TelaEditarCategorias view;
@@ -84,23 +78,6 @@ public class CategoriasController {
 		view.atualizarListaAdicao(novaCategoria, getListenerBotaoEditar(), getListenerBotaoExcluir());
 		telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
 	}
-	
-	// TESTE TEMPORARIO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//	public void validarAdicaoCategoria() {
-//		ArrayList<String> categorias = new ArrayList<>();
-//		
-//		categorias.add("Alimentação");
-//		categorias.add("Transporte");
-//		categorias.add("Lazer");
-//		categorias.add("Educação");
-//		categorias.add("Salário");
-//
-//		for(String categoria : categorias) {
-//			gerenciador.adicionarCategoria(categoria);
-//			view.atualizarListaAdicao(categoria, getListenerBotaoEditar(), getListenerBotaoExcluir());
-//			telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
-//		}
-//	}
 	
 	public void validarRemocaoCategoria(JButton botaoExcluir) {
 		// validar se tem alguma transação com essa categoria antes de remover

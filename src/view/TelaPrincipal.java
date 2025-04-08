@@ -202,7 +202,13 @@ public class TelaPrincipal extends JPanel {
 		
 		Object[][] dados = {};
 		
-		DefaultTableModel modeloTabelaTransacoes = new DefaultTableModel(dados, colunasTabela);
+		DefaultTableModel modeloTabelaTransacoes = new DefaultTableModel(dados, colunasTabela) {
+			@Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
 		tabelaTransacoes = new JTable(modeloTabelaTransacoes);
 		tabelaTransacoes.getColumnModel().getColumn(4).setCellRenderer(new RenderizadorCelulaTabelaCustomizado());
 		tabelaTransacoes.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));

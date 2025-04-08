@@ -10,8 +10,6 @@ import view.TelaPrincipal;
 import model.GerenciadorUsuario;
 import model.GerenciadorFinanceiro;
 
-import model.Usuario;
-
 public class LoginController {
 	private MainFrame mainFrame;
 	private TelaLogin telaLogin;
