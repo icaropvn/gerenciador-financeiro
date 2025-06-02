@@ -1,6 +1,7 @@
 package controller;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.awt.event.*;
 import javax.swing.JOptionPane;
 
@@ -8,6 +9,8 @@ import view.MainFrame;
 import view.TelaLogin;
 import view.TelaPrincipal;
 import model.GerenciadorUsuario;
+import model.Transacao;
+import model.Usuario;
 import model.GerenciadorFinanceiro;
 
 public class LoginController {
@@ -47,21 +50,27 @@ public class LoginController {
 		String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
 		String senha = telaLogin.getPasswordInput().getText().trim();
 		
-		if(nome.isEmpty() || senha.isEmpty()) {
-			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		// ===== PRODUÇÃO =====
+//		if(nome.isEmpty() || senha.isEmpty()) {
+//			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
+//		
+//		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
+//		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
+//			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+//			return;
+//		}
 		
-		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
-		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
-			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
+		// gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
+		// =======================
 		
-		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
+		// ----- DEBUG -----
+		gerenciadorUsuario.setUsuarioAtual(new Usuario("Ícaro", "123", 16500));
+		// -----------------
 		
 		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
-		Object[][] listaTransacoes = gerenciadorFinanceiro.transformarListaEmMatriz(gerenciadorUsuario.getUsuarioAtual().getHistoricoTransacoes());
+		List<Transacao> listaTransacoes = gerenciadorUsuario.getUsuarioAtual().getHistoricoTransacoes();
 		telaPrincipal.substituirTabelaTransacoes(listaTransacoes);
 		
 		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");

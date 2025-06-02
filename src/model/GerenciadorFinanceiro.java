@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class GerenciadorFinanceiro {
 	private double despesasIntervaloFiltrado;
@@ -35,7 +36,7 @@ public class GerenciadorFinanceiro {
 		usuario.setSaldo(usuario.getSaldo() + receita);
 	}
 	
-	public Object[][] aplicarFiltros(Usuario usuarioAtual, LocalDate filtroDataInicial, LocalDate filtroDataFinal, String filtroClassificacao, String filtroCategoria) {
+	public List<Transacao> aplicarFiltros(Usuario usuarioAtual, LocalDate filtroDataInicial, LocalDate filtroDataFinal, String filtroClassificacao, String filtroCategoria) {
 		ArrayList<Transacao> listaTransacoes = usuarioAtual.getHistoricoTransacoes();
 		ArrayList<Transacao> listaTransacoesFiltrada = new ArrayList<>();
 		setDespesasIntervaloFiltrado(0);
@@ -69,16 +70,11 @@ public class GerenciadorFinanceiro {
 			}
 		}
 		
-		Object[][] transacoesFiltradas = transformarListaEmMatriz(listaTransacoesFiltrada);
-	    
-	    return transacoesFiltradas;
+	    return listaTransacoesFiltrada;
 	}
 	
-	public Object[][] retirarFiltros(Usuario usuarioAtual) {
-		ArrayList<Transacao> transacoes = usuarioAtual.getHistoricoTransacoes();
-		
-		Object[][] transacoesSemFiltro = transformarListaEmMatriz(transacoes);
-	    
+	public List<Transacao> retirarFiltros(Usuario usuarioAtual) {
+		ArrayList<Transacao> transacoesSemFiltro = usuarioAtual.getHistoricoTransacoes();
 	    return transacoesSemFiltro;
 	}
 	

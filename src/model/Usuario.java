@@ -39,6 +39,10 @@ public class Usuario {
 		historicoTransacoes.add(0, novaTransacao);
 	}
 	
+	public void removerTransacao(Transacao transacao) {
+		historicoTransacoes.remove(transacao);
+	}
+	
 	public boolean existeTransacaoComCategoria(String categoria) {
 		for(Transacao transacao : historicoTransacoes) {
 			if(transacao.getCategoria().getDescricao().equals(categoria))
@@ -46,5 +50,16 @@ public class Usuario {
 		}
 		
 		return false;
+	}
+	
+	// DEBUG
+	public void imprimirListaTransacoes() {
+		for(Transacao transacao : historicoTransacoes) {
+			System.out.println(transacao.getData());
+			System.out.println(transacao.getValor());
+			System.out.println(transacao.getDescricao());
+			System.out.println(transacao.getCategoria().getDescricao());
+			System.out.println(transacao.getClassificacao());
+		}
 	}
 }

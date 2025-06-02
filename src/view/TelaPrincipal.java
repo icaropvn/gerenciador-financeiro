@@ -3,17 +3,27 @@ package view;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import model.Categoria;
 import model.Transacao;
 import util.RegExData;
 import util.RenderizadorCelulaTabelaCustomizado;
+import util.ModeloTabelaTransacoes;
 
 public class TelaPrincipal extends JPanel {
 	private JLabel saudacao;
@@ -198,31 +208,10 @@ public class TelaPrincipal extends JPanel {
 		tituloPainelHistorico.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 		painelHistorico.add(tituloPainelHistorico, BorderLayout.NORTH);
 		
-		String[] colunasTabela = {"Data", "Valor", "Descrição", "Categoria", "Classificação"};
-		
-		Object[][] dados = {};
-		
-		DefaultTableModel modeloTabelaTransacoes = new DefaultTableModel(dados, colunasTabela) {
-			@Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+		ModeloTabelaTransacoes modeloTabelaTransacoes = new ModeloTabelaTransacoes(null);
         
 		tabelaTransacoes = new JTable(modeloTabelaTransacoes);
-		tabelaTransacoes.getColumnModel().getColumn(4).setCellRenderer(new RenderizadorCelulaTabelaCustomizado());
-		tabelaTransacoes.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
-		tabelaTransacoes.getTableHeader().setBackground(Color.decode("#D0D7FF"));
-		tabelaTransacoes.getTableHeader().setOpaque(true);
-		tabelaTransacoes.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		tabelaTransacoes.setRowHeight(tabelaTransacoes.getFontMetrics(tabelaTransacoes.getFont()).getHeight() + 4);
-		
-		TableColumnModel modeloColunas = tabelaTransacoes.getColumnModel();
-		modeloColunas.getColumn(0).setPreferredWidth(60);;
-		modeloColunas.getColumn(1).setPreferredWidth(60);
-		modeloColunas.getColumn(2).setPreferredWidth(300);
-		modeloColunas.getColumn(3).setPreferredWidth(100);
-		modeloColunas.getColumn(4).setPreferredWidth(100);
+		aplicarEstilosTabela();
 		
 		JScrollPane scrollTabela = new JScrollPane(tabelaTransacoes);
 		
@@ -286,6 +275,10 @@ public class TelaPrincipal extends JPanel {
 		return botaoAplicarFiltros;
 	}
 	
+	public JTable getTabelaTransacoes() {
+		return tabelaTransacoes;
+	}
+	
 	// outros métodos
 	public void atualizarFiltroCategorias(List<Categoria> listaCategorias) {
 		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
@@ -297,40 +290,80 @@ public class TelaPrincipal extends JPanel {
 		selectCategoria.setModel(modeloSelectCategoria);
 	}
 	
-	public void adicionarTransacaoTabela(Transacao novaTransacao) {
-		String classificacao = novaTransacao.getClassificacao();
+	public void adicionarTransacaoTabela(Transacao novaTransacao) {		
+		((ModeloTabelaTransacoes)tabelaTransacoes.getModel()).adicionarTransacao(novaTransacao);
+		aplicarEstilosTabela();
+	}
+	
+	public void removerTransacaoTabela(Transacao transacaoRemover) {
+		ModeloTabelaTransacoes modelo = (ModeloTabelaTransacoes) tabelaTransacoes.getModel();
+		int indiceTransacao = modelo.getTransacoes().indexOf(transacaoRemover);
 		
-		DecimalFormatSymbols modeloSimbolosValor = new DecimalFormatSymbols();
-		modeloSimbolosValor.setDecimalSeparator(',');
-		DecimalFormat formatadorDecimal = new DecimalFormat("0.00", modeloSimbolosValor);
-		String valor = "R$" + formatadorDecimal.format(novaTransacao.getValor());
+		modelo.removerTransacao(indiceTransacao);
+		aplicarEstilosTabela();
+	}
+	
+	public void atualizarTransacaoTabela(Transacao transacaoEditada) {
+		ModeloTabelaTransacoes modelo = (ModeloTabelaTransacoes) tabelaTransacoes.getModel();
+		int indiceTransacao = modelo.getTransacoes().indexOf(transacaoEditada);
 		
-		String categoria = novaTransacao.getCategoria().getDescricao();
-		DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		String data = novaTransacao.getData().format(formatadorData);
-		String descricao = novaTransacao.getDescricao();
-		
-		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
-		modeloTabela.insertRow(0, new Object[]{data, valor, descricao, categoria, classificacao});
-		
-		tabelaTransacoes.revalidate();
-		tabelaTransacoes.repaint();
+		modelo.atualizarTransacao(indiceTransacao, transacaoEditada);
+		aplicarEstilosTabela();
 	}
 	
 	public void atualizarSaldo(String novoSaldo) {
 		saldo.setText("R$ " + novoSaldo);
 	}
 	
-	public void substituirTabelaTransacoes(Object[][] transacoes) {
-		DefaultTableModel modeloTabela = (DefaultTableModel) tabelaTransacoes.getModel();
-
-	    modeloTabela.setRowCount(0);
-	    
-	    for (Object[] linha : transacoes) {
-	        modeloTabela.addRow(linha);
-	    }
+	public void substituirTabelaTransacoes(List<Transacao> transacoes) {
+		List<Transacao> copia = new ArrayList<>(transacoes);
+	    ModeloTabelaTransacoes novoModel = new ModeloTabelaTransacoes(copia);
+		tabelaTransacoes.setModel(novoModel);
+		aplicarEstilosTabela();
 	    
 	    tabelaTransacoes.revalidate();
 	    tabelaTransacoes.repaint();
+	}
+	
+	public void aplicarEstilosTabela() {
+		tabelaTransacoes.getColumnModel().getColumn(4).setCellRenderer(new RenderizadorCelulaTabelaCustomizado());
+		tabelaTransacoes.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 14));
+		tabelaTransacoes.getTableHeader().setBackground(Color.decode("#D0D7FF"));
+		tabelaTransacoes.getTableHeader().setOpaque(true);
+		tabelaTransacoes.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		tabelaTransacoes.setRowHeight(tabelaTransacoes.getFontMetrics(tabelaTransacoes.getFont()).getHeight() + 4);
+		
+		TableColumnModel modeloColunas = tabelaTransacoes.getColumnModel();
+		modeloColunas.getColumn(0).setPreferredWidth(60);;
+		modeloColunas.getColumn(1).setPreferredWidth(60);
+		modeloColunas.getColumn(2).setPreferredWidth(300);
+		modeloColunas.getColumn(3).setPreferredWidth(100);
+		modeloColunas.getColumn(4).setPreferredWidth(100);
+		
+		tabelaTransacoes.getColumnModel().getColumn(0).setCellRenderer( new DefaultTableCellRenderer() {
+			private final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		        
+	        @Override
+	        protected void setValue(Object value) {
+	            LocalDate ld = (LocalDate) value;
+	            setText(ld.format(DTF));
+	        }
+		});
+		
+		tabelaTransacoes.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+			private final NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt","BR"));
+		    
+			@Override
+		    protected void setValue(Object value) {
+				setText(value != null ? nf.format((Number) value) : "");
+		    }
+		});
+		
+		tabelaTransacoes.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+			@Override
+	        protected void setValue(Object value) {
+				setText(((Categoria) value).getDescricao());
+	        }
+		});
 	}
 }

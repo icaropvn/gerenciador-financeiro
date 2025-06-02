@@ -5,35 +5,43 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import java.awt.event.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 
 import view.MainFrame;
 import view.TelaPrincipal;
 import view.TelaEditarCategorias;
+import view.TelaEditarTransacao;
 import view.TelaAdicionarTransacao;
 import model.GerenciadorCategorias;
 import model.GerenciadorFinanceiro;
 import model.GerenciadorUsuario;
+import model.Transacao;
+import util.ModeloTabelaTransacoes;
 
 public class PrincipalController {
 	private MainFrame mainFrame;
 	private TelaPrincipal view;
 	private TelaEditarCategorias telaCategorias;
 	private TelaAdicionarTransacao telaTransacao;
+	private TelaEditarTransacao telaEditarTransacao;
 	private GerenciadorCategorias gerenciadorCategorias;
 	private GerenciadorFinanceiro gerenciadorFinanceiro;
 	private GerenciadorUsuario gerenciadorUsuario;
 	
-	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
+	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
 		this.mainFrame = mainFrame;
 		this.view = telaPrincipal;
 		this.telaCategorias = telaCategorias;
 		this.telaTransacao = telaTransacao;
+		this.telaEditarTransacao = telaEditarTransacao;
 		this.gerenciadorCategorias = gerenciadorCategorias;
 		this.gerenciadorFinanceiro = gerenciadorFinanceiro;
 		this.gerenciadorUsuario = gerenciadorUsuario;
@@ -77,6 +85,14 @@ public class PrincipalController {
 				aplicarFiltros();
 			}
 		});
+		
+		view.getTabelaTransacoes().addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				telaEditarTransacao.atualizarListaCategorias(gerenciadorCategorias.getListaCategorias());
+				abrirTelaEditarTransacao(e);
+			}
+		});
 	}
 	
 	public void confirmarSaida() {
@@ -99,7 +115,7 @@ public class PrincipalController {
 		view.getSelectCategoria().setSelectedItem("Categoria");
 		
 		// retornar tabela ao estado original (mostrar todas as transações)
-		Object[][] transacoesSemFiltro = gerenciadorFinanceiro.retirarFiltros(gerenciadorUsuario.getUsuarioAtual());
+		List<Transacao> transacoesSemFiltro = gerenciadorFinanceiro.retirarFiltros(gerenciadorUsuario.getUsuarioAtual());
 		view.substituirTabelaTransacoes(transacoesSemFiltro);
 		
 		// redefinir resumo de despesas e receitas
@@ -162,7 +178,7 @@ public class PrincipalController {
 		}
 		
 		// atualiza tabela na tela com as transações filtradas
-		Object[][] transacoesFiltradas = gerenciadorFinanceiro.aplicarFiltros(gerenciadorUsuario.getUsuarioAtual(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
+		List<Transacao> transacoesFiltradas = gerenciadorFinanceiro.aplicarFiltros(gerenciadorUsuario.getUsuarioAtual(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
 		view.substituirTabelaTransacoes(transacoesFiltradas);
 		
 		// atualiza resumo de despesas e receitas no intervalo filtrado
@@ -176,5 +192,28 @@ public class PrincipalController {
 	    
 	    view.setDespesasIntervalo("R$ " + valorFormatter.format(despesasIntervalo));
 	    view.setReceitasIntervalo("R$ " + valorFormatter.format(receitasIntervalo));
+	}
+	
+	public void abrirTelaEditarTransacao(MouseEvent e) {
+		JTable tabela = view.getTabelaTransacoes();
+		
+		if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+			e.consume();
+			
+			int linhaSelecionada = tabela.getSelectedRow();
+			
+			if(linhaSelecionada < 0) {
+				return;
+				// adicionar alguma mensagem de erro
+			}
+			
+			int linhaModelo = tabela.convertRowIndexToModel(linhaSelecionada);
+			ModeloTabelaTransacoes model = (ModeloTabelaTransacoes) tabela.getModel();
+		    Transacao transacao = model.getTransacaoAt(linhaModelo);
+			
+			telaEditarTransacao.inicializarInputs(transacao);
+			telaEditarTransacao.setTransacaoEmEdicao(transacao);
+			telaEditarTransacao.setVisible(true);
+		}
 	}
 }
