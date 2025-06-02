@@ -91,6 +91,7 @@ public class EditarTransacaoController {
 		String novoSaldo = formatadorSaldo.format(usuarioAtual.getSaldo());
 		telaPrincipal.atualizarSaldo(novoSaldo);
 		
+		view.bloquearCampos();
 		view.dispose();
 	}
 	

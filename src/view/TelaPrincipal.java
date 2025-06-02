@@ -58,69 +58,87 @@ public class TelaPrincipal extends JPanel {
 		painelRaiz.setBackground(Color.decode("#e0e0e0"));
 		painelRaiz.setOpaque(true);
 		
-		JPanel painelResumo = new JPanel();
-		painelResumo.setOpaque(false);
-		painelResumo.setLayout(new BoxLayout(painelResumo, BoxLayout.Y_AXIS));
-		painelResumo.setBorder(BorderFactory.createEmptyBorder(40, 20, 40, 20));
+		JPanel painelHeader = new JPanel(new BorderLayout());
+		painelHeader.setOpaque(false);
+		painelHeader.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
+		
+		JPanel headerEsquerda = new JPanel();
+		headerEsquerda.setOpaque(false);
+		headerEsquerda.setLayout(new BoxLayout(headerEsquerda, BoxLayout.Y_AXIS));
+		
+		ImageIcon imagemLogo = new ImageIcon(TelaPrincipal.class.getResource("../resources/centsable-logo.png"));
+		ImageIcon logoRedimensionado = redimensionarLogo(imagemLogo, 200, 100);
+		JLabel labelLogo = new JLabel(logoRedimensionado);
+		headerEsquerda.add(labelLogo);
+		
+		headerEsquerda.add(Box.createVerticalStrut(20));
 		
 		saudacao = new JLabel("Olá, {user}!");
-		saudacao.setFont(new Font("SansSerif", Font.PLAIN, 20));
-		painelResumo.add(saudacao);
+		saudacao.setFont(new Font("SansSerif", Font.PLAIN, 18));
+		saudacao.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+		headerEsquerda.add(saudacao);
 		
-		JLabel tituloPainelResumo = new JLabel("Resumo Financeiro",  SwingConstants.CENTER);
-		tituloPainelResumo.setFont(new Font("SansSerif", Font.PLAIN, 16));
-		tituloPainelResumo.setForeground(Color.decode("#b2b2b2"));
-		tituloPainelResumo.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
-		tituloPainelResumo.setMaximumSize(new Dimension(Integer.MAX_VALUE, tituloPainelResumo.getPreferredSize().height));
-		painelResumo.add(tituloPainelResumo);
+		botaoSair = new JButton("Sair");
+		botaoSair.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		Dimension tamanhoBotao = new Dimension(70, 25);
+		botaoSair.setPreferredSize(tamanhoBotao);
+		botaoSair.setMaximumSize(tamanhoBotao);
+		headerEsquerda.add(botaoSair);
+		painelHeader.add(headerEsquerda, BorderLayout.WEST);
+		
+		JPanel headerDireita = new JPanel();
+		headerDireita.setOpaque(false);
+		headerDireita.setLayout(new BoxLayout(headerDireita, BoxLayout.Y_AXIS));
+		
+		headerDireita.add(Box.createVerticalGlue());
 		
 		JLabel labelSaldoAtual = new JLabel("Saldo atual");
 		labelSaldoAtual.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		painelResumo.add(labelSaldoAtual);
+		labelSaldoAtual.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		headerDireita.add(labelSaldoAtual);
 		
 		saldo = new JLabel("R$ 0,00");
 		saldo.setFont(new Font("SansSerif", Font.BOLD, 28));
-		painelResumo.add(saldo);
+		saldo.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		headerDireita.add(saldo);
+		painelHeader.add(headerDireita, BorderLayout.EAST);
 		
-		JLabel labelTotalDespesas = new JLabel("Total de despesas");
-		labelTotalDespesas.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		labelTotalDespesas.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
-		painelResumo.add(labelTotalDespesas);
+		headerDireita.add(Box.createVerticalGlue());
 		
-		despesas = new JLabel("R$ 0,00");
-		despesas.setFont(new Font("SansSerif", Font.BOLD, 18));
-		despesas.setForeground(Color.decode("#dd4b4b"));
-		despesas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-		painelResumo.add(despesas);
+//		JLabel labelTotalDespesas = new JLabel("Total de despesas");
+//		labelTotalDespesas.setFont(new Font("SansSerif", Font.PLAIN, 12));
+//		labelTotalDespesas.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
+//		painelResumo.add(labelTotalDespesas);
+//		
+//		despesas = new JLabel("R$ 0,00");
+//		despesas.setFont(new Font("SansSerif", Font.BOLD, 18));
+//		despesas.setForeground(Color.decode("#dd4b4b"));
+//		despesas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+//		painelResumo.add(despesas);
+//		
+//		JLabel labelTotalReceitas = new JLabel("Total de receitas");
+//		labelTotalReceitas.setFont(new Font("SansSerif", Font.PLAIN, 12));
+//		labelTotalReceitas.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+//		painelResumo.add(labelTotalReceitas);
+//		
+//		receitas = new JLabel("R$ 0,00");
+//		receitas.setFont(new Font("SansSerif", Font.BOLD, 18));
+//		receitas.setForeground(Color.decode("#5c7bed"));
+//		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+//		painelResumo.add(receitas);
 		
-		JLabel labelTotalReceitas = new JLabel("Total de receitas");
-		labelTotalReceitas.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		labelTotalReceitas.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-		painelResumo.add(labelTotalReceitas);
+//		JPanel containerBotaoSair = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+//		containerBotaoSair.setOpaque(false);
 		
-		receitas = new JLabel("R$ 0,00");
-		receitas.setFont(new Font("SansSerif", Font.BOLD, 18));
-		receitas.setForeground(Color.decode("#5c7bed"));
-		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-		painelResumo.add(receitas);
+//		containerBotaoSair.add(botaoSair);
 		
-		JPanel containerBotaoSair = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-		containerBotaoSair.setOpaque(false);
-		
-		botaoSair = new JButton("Sair");
-		botaoSair.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		botaoSair.setPreferredSize(new Dimension(120, botaoSair.getPreferredSize().height));
-		
-		containerBotaoSair.add(botaoSair);
-		
-		painelRaiz.add(painelResumo, BorderLayout.CENTER);
-		painelRaiz.add(containerBotaoSair, BorderLayout.SOUTH);
-		add(painelRaiz, BorderLayout.WEST);
+		painelRaiz.add(painelHeader, BorderLayout.CENTER);
+		add(painelRaiz, BorderLayout.NORTH);
 	}
 	
 	public void initPainelPrincipal() {
 		JPanel painelPrincipal = new JPanel(new BorderLayout());
-		painelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		painelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 		
 		JPanel painelSuperior = new JPanel(new BorderLayout());
 		
@@ -365,5 +383,23 @@ public class TelaPrincipal extends JPanel {
 				setText(((Categoria) value).getDescricao());
 	        }
 		});
+	}
+	
+	private ImageIcon redimensionarLogo(ImageIcon imagem, int width, int height) {
+		int origW = imagem.getIconWidth();
+		int origH = imagem.getIconHeight();
+
+		int maxW = width;
+		int maxH = height;
+
+		double escala = Math.min((double) maxW / origW, (double) maxH / origH);
+
+		int novoW = (int) (origW * escala);
+		int novoH = (int) (origH * escala);
+
+		Image imgOriginal = imagem.getImage();
+		Image imgRedimensionada = imgOriginal.getScaledInstance(novoW, novoH, Image.SCALE_SMOOTH);
+
+		return new ImageIcon(imgRedimensionada);
 	}
 }
