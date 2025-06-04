@@ -32,6 +32,7 @@ public class TelaPrincipal extends JPanel {
 	private JLabel receitas;
 	private JButton botaoSair;
 	
+	private JButton botaoResumoFinanceiro;
 	private JButton botaoEditarCategorias;
 	private JButton botaoAdicionarTransacao;
 	private JTextField inputDataInicial;
@@ -151,6 +152,10 @@ public class TelaPrincipal extends JPanel {
 		
 		JPanel containerBotoesCabecalho = new JPanel(new FlowLayout());
 		
+		botaoResumoFinanceiro = new JButton("Resumo financeiro");
+		botaoResumoFinanceiro.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		containerBotoesCabecalho.add(botaoResumoFinanceiro);
+		
 		botaoEditarCategorias = new JButton("Editar categorias");
 		botaoEditarCategorias.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		containerBotoesCabecalho.add(botaoEditarCategorias);
@@ -259,6 +264,10 @@ public class TelaPrincipal extends JPanel {
 	
 	public JButton getBotaoSair() {
 		return botaoSair;
+	}
+	
+	public JButton getBotaoResumoFinanceiro() {
+		return botaoResumoFinanceiro;
 	}
 	
 	public JButton getBotaoEditarCategorias() {

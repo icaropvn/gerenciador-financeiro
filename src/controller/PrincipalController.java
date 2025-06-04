@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 
 import view.MainFrame;
 import view.TelaPrincipal;
+import view.TelaResumoFinanceiro;
 import view.TelaEditarCategorias;
 import view.TelaEditarTransacao;
 import view.TelaAdicionarTransacao;
@@ -29,6 +30,7 @@ import util.ModeloTabelaTransacoes;
 public class PrincipalController {
 	private MainFrame mainFrame;
 	private TelaPrincipal view;
+	private TelaResumoFinanceiro telaResumo;
 	private TelaEditarCategorias telaCategorias;
 	private TelaAdicionarTransacao telaTransacao;
 	private TelaEditarTransacao telaEditarTransacao;
@@ -36,9 +38,10 @@ public class PrincipalController {
 	private GerenciadorFinanceiro gerenciadorFinanceiro;
 	private GerenciadorUsuario gerenciadorUsuario;
 	
-	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
+	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaResumoFinanceiro telaResumo, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
 		this.mainFrame = mainFrame;
 		this.view = telaPrincipal;
+		this.telaResumo = telaResumo;
 		this.telaCategorias = telaCategorias;
 		this.telaTransacao = telaTransacao;
 		this.telaEditarTransacao = telaEditarTransacao;
@@ -54,6 +57,13 @@ public class PrincipalController {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				confirmarSaida();
+			}
+		});
+		
+		view.getBotaoResumoFinanceiro().addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mostrarTelaResumoFinanceiro();
 			}
 		});
 		
@@ -102,6 +112,11 @@ public class PrincipalController {
 			gerenciadorUsuario.setUsuarioAtual(null);				
 			mainFrame.mostrarTela("login");
 		}
+	}
+	
+	public void mostrarTelaResumoFinanceiro() {
+		telaResumo.inicializarSelectCategorias(gerenciadorCategorias.getListaCategorias());
+		telaResumo.setVisible(true);
 	}
 	
 	public void mostrarTelaEditarCategorias() {
