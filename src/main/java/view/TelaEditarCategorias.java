@@ -8,8 +8,8 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Categoria;
 import controller.CategoriasController;
+import model.entity.Categoria;
 import util.CapitalizeString;
 
 public class TelaEditarCategorias extends JFrame {

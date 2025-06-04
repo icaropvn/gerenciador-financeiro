@@ -15,6 +15,8 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
 
-        <!-- <mapping class="com.casdeveloper.model.entity.Contact" /> -->
+        <mapping class="model.entity.Usuario"/>
+    	<mapping class="model.entity.Categoria"/>
+    	<mapping class="model.entity.Transacao"/>
     </session-factory>
 </hibernate-configuration>

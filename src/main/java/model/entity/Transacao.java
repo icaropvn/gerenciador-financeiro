@@ -1,26 +1,54 @@
-package model;
+package model.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "transacao")
 public class Transacao {
-	private static int nextId = 0;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private long id;
 	
-	private int id;
+	@Column(nullable = false, length = 20)
 	private String classificacao;
+	
+	@Column(nullable = false)
 	private double valor;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "categoria_id", nullable = false)
 	private Categoria categoria;
+	
+	@Column(nullable = false)
 	private LocalDate data;
+	
+	@Column(length = 255)
 	private String descricao;
 	
-	public Transacao(String classificacao, double valor, Categoria categoria, LocalDate data, String descricao) {
-		id = nextId++;
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+	private Usuario usuario;
+	
+	public Transacao(){}
+	
+	public Transacao(String classificacao, double valor, Categoria categoria, LocalDate data, String descricao, Usuario usuario) {
 		this.classificacao = classificacao;
 		this.valor = valor;
 		this.categoria = categoria;
 		this.data = data;
 		this.descricao = descricao;
+		this.usuario = usuario;
 	}
 	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
 	public String getClassificacao() {
 		return classificacao;
 	}
@@ -61,13 +89,13 @@ public class Transacao {
 		this.descricao = descricao;
 	}
 	
-	public static Transacao copiarTransacao(Transacao transacaoACopiar) {
+	public static Transacao copiarTransacao(Transacao transacaoACopiar, Usuario usuarioAtual) {
 		LocalDate dataCopiada = transacaoACopiar.getData();
 		double valorCopiado = transacaoACopiar.getValor();
 		String descricaoCopiada = transacaoACopiar.getDescricao();
 		Categoria categoriaCopiada = transacaoACopiar.getCategoria();
 		String classificacaoCopiada = transacaoACopiar.getClassificacao();
 		
-		return new Transacao(classificacaoCopiada, valorCopiado, categoriaCopiada, dataCopiada, descricaoCopiada);
+		return new Transacao(classificacaoCopiada, valorCopiado, categoriaCopiada, dataCopiada, descricaoCopiada, usuarioAtual);
 	}
 }

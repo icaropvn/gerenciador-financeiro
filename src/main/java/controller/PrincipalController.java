@@ -21,10 +21,11 @@ import view.TelaResumoFinanceiro;
 import view.TelaEditarCategorias;
 import view.TelaEditarTransacao;
 import view.TelaAdicionarTransacao;
-import model.GerenciadorCategorias;
-import model.GerenciadorFinanceiro;
-import model.GerenciadorUsuario;
-import model.Transacao;
+import model.entity.Transacao;
+import model.entity.Usuario;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 import util.ModeloTabelaTransacoes;
 
 public class PrincipalController {
@@ -53,6 +54,8 @@ public class PrincipalController {
 	}
 	
 	public void initControllers() {
+		carregarTabelaTransacoes();
+		
 		view.getBotaoSair().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -77,7 +80,7 @@ public class PrincipalController {
 		view.getBotaoAdicionarTransacao().addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				telaTransacao.atualizarListaCategorias(gerenciadorCategorias.getListaCategorias());
+				telaTransacao.atualizarListaCategorias(gerenciadorCategorias.listarTodasCategorias());
 				telaTransacao.setVisible(true);
 			}
 		});
@@ -99,11 +102,31 @@ public class PrincipalController {
 		view.getTabelaTransacoes().addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				telaEditarTransacao.atualizarListaCategorias(gerenciadorCategorias.getListaCategorias());
+				telaEditarTransacao.atualizarListaCategorias(gerenciadorCategorias.listarTodasCategorias());
 				abrirTelaEditarTransacao(e);
 			}
 		});
 	}
+	
+	private void carregarTabelaTransacoes() {
+        Usuario u = gerenciadorUsuario.getUsuarioAtual();
+        
+        if (u == null) {
+        	return;
+        }
+
+        List<Transacao> todas = gerenciadorFinanceiro.listarTransacoesPorUsuario(u.getId());
+
+        view.substituirTabelaTransacoes(todas);
+
+        double saldo = gerenciadorUsuario.getUsuarioAtual().getSaldo();
+        view.setSaldo(formatarMoeda(saldo));
+    }
+	
+	private String formatarMoeda(double valor) {
+        DecimalFormat df = new DecimalFormat("R$ #,##0.00");
+        return df.format(valor);
+    }
 	
 	public void confirmarSaida() {
 		int confirmarSaida = JOptionPane.showConfirmDialog(view, "Tem certeza que deseja sair da sua conta?", "Confirmação de saída", JOptionPane.YES_NO_OPTION);
@@ -115,7 +138,7 @@ public class PrincipalController {
 	}
 	
 	public void mostrarTelaResumoFinanceiro() {
-		telaResumo.inicializarSelectCategorias(gerenciadorCategorias.getListaCategorias());
+		telaResumo.inicializarSelectCategorias(gerenciadorCategorias.listarTodasCategorias());
 		telaResumo.setVisible(true);
 	}
 	
@@ -125,19 +148,11 @@ public class PrincipalController {
 	
 	public void limparFiltros() {
 		view.getInputDataInicial().setText("");
-		view.getInputDataFinal().setText("");
-		view.getSelectClassificacao().setSelectedItem("Classificação");
-		view.getSelectCategoria().setSelectedItem("Categoria");
-		
-		// retornar tabela ao estado original (mostrar todas as transações)
-		List<Transacao> transacoesSemFiltro = gerenciadorFinanceiro.retirarFiltros(gerenciadorUsuario.getUsuarioAtual());
-		view.substituirTabelaTransacoes(transacoesSemFiltro);
-		
-		// redefinir resumo de despesas e receitas
-		gerenciadorFinanceiro.setDespesasIntervaloFiltrado(0);
-		gerenciadorFinanceiro.setReceitasIntervaloFiltrado(0);
-		view.setDespesasIntervalo("R$ 0,00");
-	    view.setReceitasIntervalo("R$ 0,00");
+        view.getInputDataFinal().setText("");
+        view.getSelectClassificacao().setSelectedIndex(0);
+        view.getSelectCategoria().setSelectedIndex(0);
+
+        carregarTabelaTransacoes();
 	}
 	
 	public void aplicarFiltros() {
@@ -146,7 +161,6 @@ public class PrincipalController {
 		String conteudoSelectClassificacao = (String)view.getSelectClassificacao().getSelectedItem();
 		String conteudoSelectCategoria = (String)view.getSelectCategoria().getSelectedItem();
 		
-		// se todos os inputs estiverem "vazios", alertar o usuário
 		if(conteudoDataInicial.isEmpty() &&
 		   conteudoDataFinal.isEmpty() &&
 		   conteudoSelectClassificacao.equals("Classificação") &&
@@ -155,58 +169,67 @@ public class PrincipalController {
 			return;
 		}
 		
-		// verificação se a categoria existe no sistema
 		if(!conteudoSelectCategoria.equals("Categoria") && !gerenciadorCategorias.isThereCategoria(conteudoSelectCategoria)) {
 			JOptionPane.showMessageDialog(view, "Algo deu errado ao filtrar por essa categoria.", "Erro ao filtrar por categoria", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		// verificar formato das datas
-		Pattern pattern = Pattern.compile("^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\\d{4}$");
-		Matcher matcherDataInicial = pattern.matcher(conteudoDataInicial);
-		Matcher matcherDataFinal = pattern.matcher(conteudoDataFinal);
+		LocalDate dataIni = null, dataFim = null;
+		DateTimeFormatter dtFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		
-		if(!conteudoDataInicial.isEmpty() && !matcherDataInicial.matches()) {
-			JOptionPane.showMessageDialog(view, "Insira uma data inicial válida para filtrar. Use o formato DD/MM/AAAA.", "Data de filtragem inválida", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		if(!conteudoDataFinal.isEmpty() && !matcherDataFinal.matches()) {
-			JOptionPane.showMessageDialog(view, "Insira uma data final válida para filtrar. Use o formato DD/MM/AAAA.", "Data de filtragem inválida", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		LocalDate dataInicial;
-		LocalDate dataFinal;
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		
-		try {
-			dataInicial = LocalDate.parse(conteudoDataInicial, formatter);
-		} catch(DateTimeParseException e) {
-			dataInicial = null;
-		}
-		
-		try {
-			dataFinal = LocalDate.parse(conteudoDataFinal, formatter);
-		} catch(DateTimeParseException e) {
-			dataFinal = null;
-		}
-		
-		// atualiza tabela na tela com as transações filtradas
-		List<Transacao> transacoesFiltradas = gerenciadorFinanceiro.aplicarFiltros(gerenciadorUsuario.getUsuarioAtual(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
-		view.substituirTabelaTransacoes(transacoesFiltradas);
-		
-		// atualiza resumo de despesas e receitas no intervalo filtrado
-		double despesasIntervalo = gerenciadorFinanceiro.getDespesasIntervaloFiltrado();
-		double receitasIntervalo = gerenciadorFinanceiro.getReceitasIntervaloFiltrado();
-		
-		DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-	    symbols.setDecimalSeparator(',');
-	    symbols.setGroupingSeparator('.');
-	    DecimalFormat valorFormatter = new DecimalFormat("0.00", symbols);
+        try {
+            if (!conteudoDataInicial.isEmpty()) {
+                dataIni = LocalDate.parse(conteudoDataInicial, dtFormatter);
+            }
+            if (!conteudoDataFinal.isEmpty()) {
+                dataFim = LocalDate.parse(conteudoDataFinal, dtFormatter);
+            }
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(view, "Formato de data inválido. Use dd/MM/yyyy", "Erro de Filtro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (dataIni != null && dataFim != null && dataFim.isBefore(dataIni)) {
+        	JOptionPane.showMessageDialog(view, "Data final não pode ser anterior à data inicial.", "Erro de Filtro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String categoriaFiltro = null;
+        if (!"Categoria".equals(conteudoSelectClassificacao)) {
+            categoriaFiltro = conteudoSelectClassificacao;
+        }
+
+        String classificacaoFiltro = null;
+        if (!"Classificação".equals(conteudoSelectCategoria)) {
+            classificacaoFiltro = conteudoSelectCategoria;
+        }
+        
+        Usuario u = gerenciadorUsuario.getUsuarioAtual();
+        List<Transacao> filtradas = gerenciadorFinanceiro.buscarTransacoesFiltradas(
+                u.getId(),
+                dataIni, dataFim,
+                classificacaoFiltro,
+                categoriaFiltro
+        );
+
+        view.substituirTabelaTransacoes(filtradas);
+        
+        double saldo = gerenciadorUsuario.getUsuarioAtual().getSaldo();
+        view.setSaldo(formatarMoeda(saldo));
+        
+        double receitasIntervalo = 0.0;
+        double despesasIntervalo = 0.0;
+
+        for (Transacao t : filtradas) {
+            if ("Receita".equalsIgnoreCase(t.getClassificacao())) {
+                receitasIntervalo += t.getValor();
+            } else {
+                despesasIntervalo += t.getValor();
+            }
+        }
 	    
-	    view.setDespesasIntervalo("R$ " + valorFormatter.format(despesasIntervalo));
-	    view.setReceitasIntervalo("R$ " + valorFormatter.format(receitasIntervalo));
+	    view.setDespesasIntervalo("R$ " + formatarMoeda(despesasIntervalo));
+	    view.setReceitasIntervalo("R$ " + formatarMoeda(receitasIntervalo));
 	}
 	
 	public void abrirTelaEditarTransacao(MouseEvent e) {
@@ -219,7 +242,6 @@ public class PrincipalController {
 			
 			if(linhaSelecionada < 0) {
 				return;
-				// adicionar alguma mensagem de erro
 			}
 			
 			int linhaModelo = tabela.convertRowIndexToModel(linhaSelecionada);

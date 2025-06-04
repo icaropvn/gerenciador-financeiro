@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
 
-import model.GerenciadorCategorias;
-import model.GerenciadorFinanceiro;
-import model.GerenciadorUsuario;
-import model.Transacao;
+import model.entity.Transacao;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 import view.TelaResumoFinanceiro;
 
 public class ResumoFinanceiroController {
@@ -120,10 +120,10 @@ public class ResumoFinanceiroController {
 		}
 		
 		// filtra as transações de acordo com os parâmetros
-		List<Transacao> transacoesFiltradas = gerenciadorFinanceiro.aplicarFiltros(gerenciadorUsuario.getUsuarioAtual(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
+		List<Transacao> transacoesFiltradas = gerenciadorFinanceiro.buscarTransacoesFiltradas(gerenciadorUsuario.getUsuarioAtual().getId(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
 		
-		double despesasIntervalo = gerenciadorFinanceiro.getDespesasIntervaloFiltrado();
-		double receitasIntervalo = gerenciadorFinanceiro.getReceitasIntervaloFiltrado();
+		double despesasIntervalo = gerenciadorFinanceiro.somaDespesasFiltradas(gerenciadorUsuario.getUsuarioAtual().getId(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
+		double receitasIntervalo = gerenciadorFinanceiro.somaReceitasFiltradas(gerenciadorUsuario.getUsuarioAtual().getId(), dataInicial, dataFinal, conteudoSelectClassificacao, conteudoSelectCategoria);
 		double saldo = receitasIntervalo - despesasIntervalo;
 		
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols();

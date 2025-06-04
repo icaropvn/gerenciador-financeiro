@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-import model.Transacao;
+import model.entity.Transacao;
 
 public class ModeloTabelaTransacoes extends AbstractTableModel {
 	private final String[] colunas = {"Data", "Valor", "Descrição", "Categoria", "Classificação"};

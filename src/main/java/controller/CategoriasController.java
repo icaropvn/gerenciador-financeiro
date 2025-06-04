@@ -1,17 +1,18 @@
 package controller;
 
 import java.util.ArrayList;
-
+import java.util.List;
 import java.awt.event.*;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import model.GerenciadorCategorias;
-import model.GerenciadorCategorias.TipoVerificacao;
-import model.GerenciadorUsuario;
-import model.Usuario;
+import model.dao.TransacaoDAO;
+import model.entity.Usuario;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorCategorias.TipoVerificacao;
+import model.service.GerenciadorUsuario;
 import util.CapitalizeString;
 import view.TelaEditarCategorias;
 import view.TelaPrincipal;
@@ -76,16 +77,17 @@ public class CategoriasController {
 		view.getAdicionarCategoriaInput().setText("");
 		gerenciador.adicionarCategoria(novaCategoria);
 		view.atualizarListaAdicao(novaCategoria, getListenerBotaoEditar(), getListenerBotaoExcluir());
-		telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
+		telaPrincipal.atualizarFiltroCategorias(gerenciador.listarTodasCategorias());
 	}
 	
 	public void validarRemocaoCategoria(JButton botaoExcluir) {
 		// validar se tem alguma transação com essa categoria antes de remover
-		ArrayList<Usuario> listaUsuarios = gerenciadorUsuario.getUsuariosCadastrados();
+		List<Usuario> listaUsuarios = gerenciadorUsuario.listarTodosUsuarios();
+		TransacaoDAO transacaoDao = new TransacaoDAO();
 		boolean existeTransacoes = false;
 		
 		for(Usuario usuario : listaUsuarios) {
-			existeTransacoes = usuario.existeTransacaoComCategoria((String)botaoExcluir.getClientProperty("categoria"));
+			existeTransacoes = transacaoDao.existePorUsuarioECategoria(usuario.getId(), (String)botaoExcluir.getClientProperty("categoria"));
 			
 			if(existeTransacoes)
 				break;
@@ -102,7 +104,7 @@ public class CategoriasController {
 			String categoriaRemover = (String)botaoExcluir.getClientProperty("categoria");
 			gerenciador.removerCategoria(categoriaRemover);
 			view.atualizarListaRemocao(categoriaRemover, (JPanel)botaoExcluir.getParent());
-			telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
+			telaPrincipal.atualizarFiltroCategorias(gerenciador.listarTodasCategorias());
 		}
 	}
 	
@@ -149,7 +151,7 @@ public class CategoriasController {
 		view.habilitarBotoesEdicao(novoNomeCategoria);
 		view.atualizarListaEdicao(novoNomeCategoria, inputNomeCategoria, botaoEditar, botaoExcluir);
 		
-		telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
+		telaPrincipal.atualizarFiltroCategorias(gerenciador.listarTodasCategorias());
 	}
 	
 	public void acoesAoFecharJanela() {

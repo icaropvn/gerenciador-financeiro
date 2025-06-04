@@ -3,11 +3,13 @@ package view;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
+
+import model.entity.Categoria;
+
 import java.util.Date;
 import java.util.List;
 
 import util.NumericDocumentFilter;
-import model.Categoria;
 
 public class TelaAdicionarTransacao extends JFrame {
 	private MainFrame mainFrame;

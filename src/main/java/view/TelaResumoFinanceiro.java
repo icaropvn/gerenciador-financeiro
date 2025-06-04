@@ -3,9 +3,10 @@ package view;
 import java.awt.*;
 import javax.swing.*;
 
+import model.entity.Categoria;
+
 import java.util.List;
 
-import model.Categoria;
 import util.RegExData;
 
 public class TelaResumoFinanceiro extends JFrame {

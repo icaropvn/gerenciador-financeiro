@@ -14,12 +14,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 
-import model.Categoria;
-import model.GerenciadorCategorias;
-import model.GerenciadorFinanceiro;
-import model.GerenciadorUsuario;
-import model.Transacao;
-import model.Usuario;
+import model.entity.Categoria;
+import model.entity.Transacao;
+import model.entity.Usuario;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 import view.TelaEditarTransacao;
 import view.TelaPrincipal;
 
@@ -144,7 +144,7 @@ public class EditarTransacaoController {
 		view.bloquearCampos();
 		
 		Transacao transacao = view.getTransacaoEmEdicao();
-		Transacao transacaoAntiga = Transacao.copiarTransacao(transacao);
+		Transacao transacaoAntiga = Transacao.copiarTransacao(transacao, gerenciadorUsuario.getUsuarioAtual());
 		Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
 		
 		double valorTransacaoDouble = Double.parseDouble(conteudoValor.replace(",", "."));

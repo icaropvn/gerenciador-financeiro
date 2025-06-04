@@ -19,8 +19,8 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import model.Categoria;
-import model.Transacao;
+import model.entity.Categoria;
+import model.entity.Transacao;
 import util.RegExData;
 import util.RenderizadorCelulaTabelaCustomizado;
 import util.ModeloTabelaTransacoes;

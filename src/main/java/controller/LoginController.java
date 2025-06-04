@@ -8,10 +8,10 @@ import javax.swing.JOptionPane;
 import view.MainFrame;
 import view.TelaLogin;
 import view.TelaPrincipal;
-import model.GerenciadorUsuario;
-import model.Transacao;
-import model.Usuario;
-import model.GerenciadorFinanceiro;
+import model.entity.Transacao;
+import model.entity.Usuario;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 
 public class LoginController {
 	private MainFrame mainFrame;
@@ -46,40 +46,35 @@ public class LoginController {
 		});
 	}
 	
-	public void validarLogin() {
-		String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
-		String senha = telaLogin.getPasswordInput().getText().trim();
-		
-		// ===== PRODUÇÃO =====
-		if(nome.isEmpty() || senha.isEmpty()) {
-			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
-		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
-			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
-		// =======================
-		
-		// ----- DEBUG -----
-//		gerenciadorUsuario.setUsuarioAtual(new Usuario("Ícaro", "123", 16500));
-		// -----------------
-		
-		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");
-		List<Transacao> listaTransacoes = gerenciadorUsuario.getUsuarioAtual().getHistoricoTransacoes();
-		telaPrincipal.substituirTabelaTransacoes(listaTransacoes);
-		
-		DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
-		String saldo = formatador.format(gerenciadorUsuario.getUsuarioAtual().getSaldo());
-		telaPrincipal.setSaldo(saldo);
-		
-		telaLogin.getUserInput().setText("");
-		telaLogin.getPasswordInput().setText("");
-		
-		mainFrame.mostrarTela("principal");
-	}
+	private void validarLogin() {
+        String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
+        String senha = telaLogin.getPasswordInput().getText().trim();
+        
+        if (nome.isEmpty() || senha.isEmpty()) {
+            JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        Usuario u = gerenciadorUsuario.validarLogin(nome, senha);
+        
+        if (u == null) {
+            JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        gerenciadorUsuario.setUsuarioAtual(u);
+
+        telaPrincipal.setSaudacao("Olá, " + u.getNome() + "!");
+        List<Transacao> listaTransacoes = u.getHistoricoTransacoes();
+        telaPrincipal.substituirTabelaTransacoes(listaTransacoes);
+
+        DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
+        String saldoFormatado = formatador.format(u.getSaldo());
+        telaPrincipal.setSaldo(saldoFormatado);
+
+        telaLogin.getUserInput().setText("");
+        telaLogin.getPasswordInput().setText("");
+
+        mainFrame.mostrarTela("principal");
+    }
 }

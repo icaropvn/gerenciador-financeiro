@@ -12,14 +12,12 @@ import javax.swing.*;
 
 import view.TelaAdicionarTransacao;
 import view.TelaPrincipal;
-import model.GerenciadorUsuario;
-import model.GerenciadorCategorias;
-import model.GerenciadorFinanceiro;
-import model.Usuario;
-import model.Transacao;
-import model.Categoria;
-
-
+import model.entity.Categoria;
+import model.entity.Transacao;
+import model.entity.Usuario;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 
 import java.util.ArrayList;
 
@@ -88,7 +86,7 @@ public class TransacoesController {
 		Date dataDate = (Date)view.getDataInput().getValue();
 		LocalDate dataTransacao = dataDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 		
-		Transacao novaTransacao = new Transacao(classificacaoSelecionada, valorTransacaoDouble, categoriaTransacao, dataTransacao, conteudoDescricao);
+		Transacao novaTransacao = new Transacao(classificacaoSelecionada, valorTransacaoDouble, categoriaTransacao, dataTransacao, conteudoDescricao, gerenciadorUsuario.getUsuarioAtual());
 		usuario.adicionarTransacao(novaTransacao);
 		telaPrincipal.adicionarTransacaoTabela(novaTransacao);
 		

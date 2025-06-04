@@ -5,6 +5,9 @@ import view.TelaResumoFinanceiro;
 import view.TelaAdicionarTransacao;
 import controller.*;
 import model.*;
+import model.service.GerenciadorCategorias;
+import model.service.GerenciadorFinanceiro;
+import model.service.GerenciadorUsuario;
 
 public class Main {
 	public static void main(String[] args) {

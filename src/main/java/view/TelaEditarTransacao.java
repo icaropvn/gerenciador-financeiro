@@ -9,8 +9,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
 
-import model.Categoria;
-import model.Transacao;
+import model.entity.Categoria;
+import model.entity.Transacao;
 import util.NumericDocumentFilter;
 import util.TransformarStringEmData;
 
