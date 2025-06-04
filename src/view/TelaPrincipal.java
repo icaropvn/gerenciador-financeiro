@@ -308,6 +308,8 @@ public class TelaPrincipal extends JPanel {
 	
 	// outros métodos
 	public void atualizarFiltroCategorias(List<Categoria> listaCategorias) {
+		selectCategoria.removeAllItems();
+		
 		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
 		modeloSelectCategoria.addElement("Categoria");
 		for(Categoria categoria : listaCategorias) {

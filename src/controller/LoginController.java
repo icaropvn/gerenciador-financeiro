@@ -51,22 +51,22 @@ public class LoginController {
 		String senha = telaLogin.getPasswordInput().getText().trim();
 		
 		// ===== PRODUÇÃO =====
-//		if(nome.isEmpty() || senha.isEmpty()) {
-//			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-//			return;
-//		}
-//		
-//		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
-//		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
-//			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
-//			return;
-//		}
+		if(nome.isEmpty() || senha.isEmpty()) {
+			JOptionPane.showMessageDialog(telaLogin, "Preencha todos os campos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
 		
-		// gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
+		if(!gerenciadorUsuario.validarNomeUsuario(nome) ||
+		   !gerenciadorUsuario.validarSenhaUsuario(nome, senha)) {
+			JOptionPane.showMessageDialog(telaLogin, "Nome de usuário ou senha inválidos.", "Erro ao fazer login", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		
+		gerenciadorUsuario.setUsuarioAtual(gerenciadorUsuario.getUsuario(nome));
 		// =======================
 		
 		// ----- DEBUG -----
-		gerenciadorUsuario.setUsuarioAtual(new Usuario("Ícaro", "123", 16500));
+//		gerenciadorUsuario.setUsuarioAtual(new Usuario("Ícaro", "123", 16500));
 		// -----------------
 		
 		telaPrincipal.setSaudacao("Olá, " + gerenciadorUsuario.getUsuarioAtual().getNome() + "!");

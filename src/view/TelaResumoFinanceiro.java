@@ -218,6 +218,8 @@ public class TelaResumoFinanceiro extends JFrame {
 	}
 	
 	public void inicializarSelectCategorias(List<Categoria> listaCategorias) {
+		selectCategoria.removeAllItems();
+		
 		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
 		modeloSelectCategoria.addElement("Categoria");
 		for(Categoria categoria : listaCategorias) {

@@ -102,6 +102,7 @@ public class CategoriasController {
 			String categoriaRemover = (String)botaoExcluir.getClientProperty("categoria");
 			gerenciador.removerCategoria(categoriaRemover);
 			view.atualizarListaRemocao(categoriaRemover, (JPanel)botaoExcluir.getParent());
+			telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
 		}
 	}
 	
@@ -147,6 +148,8 @@ public class CategoriasController {
 		view.setModoEdicao(false);
 		view.habilitarBotoesEdicao(novoNomeCategoria);
 		view.atualizarListaEdicao(novoNomeCategoria, inputNomeCategoria, botaoEditar, botaoExcluir);
+		
+		telaPrincipal.atualizarFiltroCategorias(gerenciador.getListaCategorias());
 	}
 	
 	public void acoesAoFecharJanela() {
