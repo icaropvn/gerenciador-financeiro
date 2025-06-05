@@ -81,10 +81,14 @@ public class EditarTransacaoController {
 		try {
 	        // CHAMADA NO SERVIÇO: ele já busca NOVAMENTE do BD
 	        // (não passe a instância “detached”, apenas o ID).
-	        gerenciadorFinanceiro.excluirTransacao(usuarioAtual.getId(), idTransacao);
+	        Usuario usuarioAtualizado = gerenciadorFinanceiro.excluirTransacao(usuarioAtual.getId(), idTransacao);
 
 	        // Depois de excluir, recarregue a lista de transações na tela principal:
 	        telaPrincipal.removerTransacaoTabela(transacaoRemover);
+	        
+	        double novoSaldo = usuarioAtualizado.getSaldo();
+	        DecimalFormat formatador = new DecimalFormat("#,##0.00");
+	        telaPrincipal.setSaldo("R$ " + formatador.format(novoSaldo));
 
 	        JOptionPane.showMessageDialog(view, "Transação removida com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
 	        view.dispose();

@@ -2,6 +2,8 @@ package model.dao;
 
 import model.entity.Transacao;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 import model.util.HibernateUtil;
 
 import java.time.LocalDate;
@@ -52,6 +54,21 @@ public class TransacaoDAO extends GenericDAO<Transacao, Long> {
             return (qtd != null && qtd > 0);
         } catch (Exception e) {
             throw new RuntimeException("Erro ao verificar existência de transação: " + e.getMessage(), e);
+        }
+    }
+    
+    public void excluirPorId(Long id) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            // HQL para remover por ID:
+            session.createQuery("DELETE FROM Transacao t WHERE t.id = :id")
+                   .setParameter("id", id)
+                   .executeUpdate();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw new RuntimeException("Erro ao excluir Transacao por ID: " + e.getMessage(), e);
         }
     }
 }

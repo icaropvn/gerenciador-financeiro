@@ -25,8 +25,9 @@ public class GerenciadorFinanceiro {
         //  pois t já foi gerenciado pela sessão do DAO.)
     }
     
-    public void excluirTransacao(Long usuarioId, Long transacaoId) {
-    	// 1) Busca a transação diretamente do BD
+    public Usuario excluirTransacao(Long usuarioId, Long transacaoId) {
+    	// 1) Busca a transação diretamente do BD, somente para obter valor e classificacao
+        //    (não vamos chamar delete(aqui), mas precisamos desses dados para ajustar saldo).
         Transacao t = transacaoDAO.buscarPorId(transacaoId);
         if (t == null || !t.getUsuario().getId().equals(usuarioId)) {
             throw new RuntimeException("Transação não encontrada para este usuário.");
@@ -41,11 +42,10 @@ public class GerenciadorFinanceiro {
         }
         usuarioDAO.atualizar(u);
 
-        // 3) Quebra o vínculo bidirecional *no lado da Transacao*, setando usuário para null
-        t.setUsuario(null);
-
-        // 4) Agora exclui a transação do BD sem gerar cascade de “re-save”
-        transacaoDAO.excluir(t);
+        // 3) Executa DELETE direto por HQL, sem tentar remover a entidade em cascata
+        transacaoDAO.excluirPorId(transacaoId);
+        
+        return u;
     }
 
     public List<Transacao> buscarTransacoesPorUsuario(Long usuarioId) {
