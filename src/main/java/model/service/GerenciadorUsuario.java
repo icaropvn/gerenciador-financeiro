@@ -1,83 +1,35 @@
 package model.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import model.dao.TransacaoDAO;
 import model.dao.UsuarioDAO;
 import model.entity.Transacao;
 import model.entity.Usuario;
 import util.CriptografarSenha;
 
+import java.util.List;
+
 public class GerenciadorUsuario {
-	private UsuarioDAO usuarioDAO = new UsuarioDAO();
-	private Usuario usuarioAtual;
-	
-	public Usuario adicionarUsuario(String nome, String senha, double saldoInicial) {
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private Usuario usuarioAtual;
+
+    public Usuario adicionarUsuario(String nome, String senha, double saldoInicial) {
         Usuario u = new Usuario(nome, senha, saldoInicial);
-        return usuarioDAO.salvarOuAtualizar(u);
+        usuarioDAO.salvar(u);
+        return u;
     }
-	
-	public Usuario buscarPorNome(String nome) {
+
+    public Usuario buscarPorNome(String nome) {
         return usuarioDAO.buscarPorNome(nome);
     }
-	
-	public Usuario validarLogin(String nome, String senha) {
-        return usuarioDAO.buscarPorNomeESenha(nome, CriptografarSenha.criptografarSenha(senha));
-    }
-	
-	public List<Usuario> listarTodosUsuarios() {
-        return usuarioDAO.buscarTodos();
+
+    public Usuario buscarPorId(Long id) {
+        return usuarioDAO.buscarPorId(id);
     }
 
-    public void adicionarTransacaoAoUsuario(Long usuarioId, Transacao novaTransacao) {
-        Usuario u = usuarioDAO.buscarPorId(usuarioId);
-        if (u == null) {
-            throw new IllegalArgumentException("Usuário não encontrado: id=" + usuarioId);
-        }
-
-        u.adicionarTransacao(novaTransacao);
-
-        if ("Receita".equalsIgnoreCase(novaTransacao.getClassificacao())) {
-            u.setSaldo(u.getSaldo() + novaTransacao.getValor());
-        } else {
-            u.setSaldo(u.getSaldo() - novaTransacao.getValor());
-        }
-
-        usuarioDAO.salvarOuAtualizar(u);
-    }
-
-    public void removerTransacaoDoUsuario(Long usuarioId, Long transacaoId) {
-        Usuario u = usuarioDAO.buscarPorId(usuarioId);
-        if (u == null) {
-            throw new IllegalArgumentException("Usuário não encontrado: id=" + usuarioId);
-        }
-
-        Transacao tRemover = null;
-        for (Transacao t : u.getHistoricoTransacoes()) {
-            if (t.getId() == transacaoId) {
-                tRemover = t;
-                break;
-            }
-        }
-        if (tRemover == null) {
-            throw new IllegalArgumentException("Transação não encontrada para exclusão: id=" + transacaoId);
-        }
-
-        if ("Receita".equalsIgnoreCase(tRemover.getClassificacao())) {
-            u.setSaldo(u.getSaldo() - tRemover.getValor());
-        } else {
-            u.setSaldo(u.getSaldo() + tRemover.getValor());
-        }
-
-        u.removerTransacao(tRemover);
-        usuarioDAO.salvarOuAtualizar(u);
-    }
-
-
-    public boolean existeTransacaoComCategoria(Long usuarioId, String descricaoCategoria) {
-        return new model.dao.TransacaoDAO().existePorUsuarioECategoria(usuarioId, descricaoCategoria);
+    public Usuario validarLogin(String nome, String senha) {
+        String senhaCripto = CriptografarSenha.criptografarSenha(senha);
+        return usuarioDAO.buscarPorNomeESenha(nome, senhaCripto);
     }
 
     public void excluirUsuario(Long usuarioId) {
@@ -86,12 +38,16 @@ public class GerenciadorUsuario {
             usuarioDAO.excluir(u);
         }
     }
-    
+
     public Usuario getUsuarioAtual() {
         return usuarioAtual;
     }
 
     public void setUsuarioAtual(Usuario usuario) {
         this.usuarioAtual = usuario;
+    }
+
+    public boolean existeTransacaoComCategoria(Long usuarioId, String descricaoCategoria) {
+        return new TransacaoDAO().existePorUsuarioECategoria(usuarioId, descricaoCategoria);
     }
 }

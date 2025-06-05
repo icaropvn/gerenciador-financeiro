@@ -106,33 +106,6 @@ public class TelaPrincipal extends JPanel {
 		
 		headerDireita.add(Box.createVerticalGlue());
 		
-//		JLabel labelTotalDespesas = new JLabel("Total de despesas");
-//		labelTotalDespesas.setFont(new Font("SansSerif", Font.PLAIN, 12));
-//		labelTotalDespesas.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
-//		painelResumo.add(labelTotalDespesas);
-//		
-//		despesas = new JLabel("R$ 0,00");
-//		despesas.setFont(new Font("SansSerif", Font.BOLD, 18));
-//		despesas.setForeground(Color.decode("#dd4b4b"));
-//		despesas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-//		painelResumo.add(despesas);
-//		
-//		JLabel labelTotalReceitas = new JLabel("Total de receitas");
-//		labelTotalReceitas.setFont(new Font("SansSerif", Font.PLAIN, 12));
-//		labelTotalReceitas.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-//		painelResumo.add(labelTotalReceitas);
-//		
-//		receitas = new JLabel("R$ 0,00");
-//		receitas.setFont(new Font("SansSerif", Font.BOLD, 18));
-//		receitas.setForeground(Color.decode("#5c7bed"));
-//		receitas.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-//		painelResumo.add(receitas);
-		
-//		JPanel containerBotaoSair = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-//		containerBotaoSair.setOpaque(false);
-		
-//		containerBotaoSair.add(botaoSair);
-		
 		painelRaiz.add(painelHeader, BorderLayout.CENTER);
 		add(painelRaiz, BorderLayout.NORTH);
 	}
@@ -413,4 +386,23 @@ public class TelaPrincipal extends JPanel {
 
 		return new ImageIcon(imgRedimensionada);
 	}
+	
+	public Transacao getTransacaoSelecionada() {
+        int linhaSelecionada = tabelaTransacoes.getSelectedRow();
+        if (linhaSelecionada < 0) {
+            return null;
+        }
+
+        int linhaModel = tabelaTransacoes.getRowSorter() != null
+            ? tabelaTransacoes.getRowSorter().convertRowIndexToModel(linhaSelecionada)
+            : linhaSelecionada;
+
+        ModeloTabelaTransacoes model = (ModeloTabelaTransacoes) tabelaTransacoes.getModel();
+        List<Transacao> transacoes = model.getTransacoes();
+        if (linhaModel >= 0 && linhaModel < transacoes.size()) {
+            return transacoes.get(linhaModel);
+        }
+
+        return null;
+    }
 }

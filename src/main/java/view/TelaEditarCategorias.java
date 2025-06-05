@@ -13,18 +13,25 @@ import model.entity.Categoria;
 import util.CapitalizeString;
 
 public class TelaEditarCategorias extends JFrame {
-	private MainFrame mainFrame;
-	private List<Categoria> categorias;
-	private boolean modoEdicao = false;
-	
-	private JTextField adicionarCategoriaInput;
-	private JButton adicionarCategoriaBotao;
-	private JPanel listaCategorias;
-	private JButton botaoOk;
+	private static final long serialVersionUID = 1L;
+
+    private MainFrame mainFrame;
+
+    // Painel que conterá as linhas de categorias
+    private JPanel listaCategorias;
+
+    // Container principal
+    private JScrollPane scrollPane;
+
+    // Campo de texto para digitar nova categoria
+    private JTextField inputNomeCategoria;
+
+    // Botões
+    private JButton botaoAdicionar;
+    private JButton botaoVoltar;
 	
 	public TelaEditarCategorias(MainFrame mainFrame) {
 		this.mainFrame = mainFrame;
-		this.categorias = new ArrayList<>();
 		
 		setTitle("Editar categorias de transações");
 		setSize(500, 500);
@@ -48,13 +55,13 @@ public class TelaEditarCategorias extends JFrame {
 		containerAdicionarCategorias.setAlignmentX(Component.CENTER_ALIGNMENT);
 		containerAdicionarCategorias.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 		
-		adicionarCategoriaInput = new JTextField();
-		adicionarCategoriaInput.setFont(new Font("SansSerif", Font.PLAIN, 12));
-		adicionarCategoriaInput.setMargin(new Insets(3, 5, 3, 5));
-		adicionarCategoriaInput.setPreferredSize(new Dimension(120, adicionarCategoriaInput.getPreferredSize().height));
+		inputNomeCategoria = new JTextField();
+		inputNomeCategoria.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		inputNomeCategoria.setMargin(new Insets(3, 5, 3, 5));
+		inputNomeCategoria.setPreferredSize(new Dimension(120, inputNomeCategoria.getPreferredSize().height));
 		
-		adicionarCategoriaBotao = new JButton("Adicionar categoria");
-		adicionarCategoriaBotao.setFont(new Font("SansSerif", Font.PLAIN, 12));
+		botaoAdicionar = new JButton("Adicionar categoria");
+		botaoAdicionar.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		
 		JPanel capsulaListaCategorias = new JPanel(new BorderLayout());
 		
@@ -69,119 +76,101 @@ public class TelaEditarCategorias extends JFrame {
 		JPanel containerBotoesFinalizar = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
 		containerBotoesFinalizar.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
 		
-		botaoOk = new JButton("Ok");
-		botaoOk.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		botaoOk.setPreferredSize(new Dimension(120, botaoOk.getPreferredSize().height));
+		botaoVoltar = new JButton("Ok");
+		botaoVoltar.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		botaoVoltar.setPreferredSize(new Dimension(120, botaoVoltar.getPreferredSize().height));
 		
 		painelRaiz.add(titulo, BorderLayout.NORTH);
-		containerAdicionarCategorias.add(adicionarCategoriaInput);
-		containerAdicionarCategorias.add(adicionarCategoriaBotao);
+		containerAdicionarCategorias.add(inputNomeCategoria);
+		containerAdicionarCategorias.add(botaoAdicionar);
 		containerCategorias.add(containerAdicionarCategorias, BorderLayout.NORTH);
 		containerCategorias.add(listaCategoriasRolavel, BorderLayout.CENTER);
 		painelRaiz.add(containerCategorias, BorderLayout.CENTER);
-		containerBotoesFinalizar.add(botaoOk);
+		containerBotoesFinalizar.add(botaoVoltar);
 		painelRaiz.add(containerBotoesFinalizar, BorderLayout.SOUTH);
 		
 		add(painelRaiz);
 	}
 	
-	public boolean isModoEdicao() {
-		return modoEdicao;
-	}
-	
-	public void setModoEdicao(boolean modoEdicao) {
-		this.modoEdicao = modoEdicao;
-	}
-	
-	public JTextField getAdicionarCategoriaInput() {
-		return adicionarCategoriaInput;
-	}
-	
-	public JButton getAdicionarCategoriaBotao() {
-		return adicionarCategoriaBotao;
-	}
-	
-	public JButton getBotaoOk() {
-		return botaoOk;
-	}
-	
-	public void atualizarListaAdicao(String novaCategoria, ActionListener listenerBotaoEditar, ActionListener listenerBotaoExcluir) {
-		JPanel linhaCategoria = new JPanel(new FlowLayout());
-		
-		JTextField labelCategoria = new JTextField(novaCategoria);
-		labelCategoria.setEnabled(false);
-		labelCategoria.setDisabledTextColor(Color.decode("#939393"));
-		labelCategoria.setMargin(new Insets(3, 5, 3, 5));
-		labelCategoria.setHorizontalAlignment(JTextField.CENTER);
-		labelCategoria.setPreferredSize(new Dimension(160, labelCategoria.getPreferredSize().height));
-		
-		JButton editarCategoria = new JButton("Editar");
-		editarCategoria.putClientProperty("categoria", novaCategoria);
-		editarCategoria.addActionListener(listenerBotaoEditar);
-		
-		JButton excluirCategoria = new JButton("Deletar");
-		excluirCategoria.putClientProperty("categoria", novaCategoria);
-		excluirCategoria.addActionListener(listenerBotaoExcluir);
-		
-		linhaCategoria.add(labelCategoria);
-		linhaCategoria.add(editarCategoria);
-		linhaCategoria.add(excluirCategoria);
-		
-		listaCategorias.add(linhaCategoria);
-		
-		listaCategorias.revalidate();
-		listaCategorias.repaint();
-	}
-	
-	public void atualizarListaRemocao(String categoriaRemovida, JPanel linhaRemover) {
-		listaCategorias.remove(linhaRemover);
-		listaCategorias.revalidate();
-		listaCategorias.repaint();
-	}
-	
-	public void atualizarListaEdicao(String novoNomeCategoria, JTextField inputNomeCategoria, JButton botaoEditar, JButton botaoExcluir) {
-		inputNomeCategoria.setEnabled(false);
-		inputNomeCategoria.setText(novoNomeCategoria);
-		
-		botaoEditar.setText("Editar");
-		botaoExcluir.setEnabled(true);
-	}
-	
-	public void desabilitarBotoesEdicao(String categoriaAtual) {
-		for(Component linha : listaCategorias.getComponents()) {
-			JPanel linhaContainer = (JPanel)linha;
-			JTextField inputCategoria = (JTextField)linhaContainer.getComponent(0);
-			
-			if(inputCategoria.getText().equals(categoriaAtual))
-				continue;
-			
-			JButton botaoEditar = (JButton)linhaContainer.getComponent(1);
-			JButton botaoExcluir = (JButton)linhaContainer.getComponent(2);
-			
-			botaoEditar.setEnabled(false);
-			botaoExcluir.setEnabled(false);
-		}
-	}
-	
-	public void habilitarBotoesEdicao(String categoriaAtual) {
-		for(Component linha : listaCategorias.getComponents()) {
-			JPanel linhaContainer = (JPanel)linha;
-			JTextField inputCategoria = (JTextField)linhaContainer.getComponent(0);
-			
-			if(inputCategoria.getText().equals(categoriaAtual))
-				continue;
-			
-			JButton botaoEditar = (JButton)linhaContainer.getComponent(1);
-			JButton botaoExcluir = (JButton)linhaContainer.getComponent(2);
-			
-			botaoEditar.setEnabled(true);
-			botaoExcluir.setEnabled(true);
-		}
-	}
-	    
-	public void limparListaCategorias() {
-		listaCategorias.removeAll();
-	    listaCategorias.revalidate();
-	    listaCategorias.repaint();
-	}
+	public JTextField getInputNomeCategoria() {
+        return inputNomeCategoria;
+    }
+
+    public JButton getBotaoAdicionar() {
+        return botaoAdicionar;
+    }
+
+    public JButton getBotaoVoltar() {
+        return botaoVoltar;
+    }
+
+    public JPanel getListaCategorias() {
+        return listaCategorias;
+    }
+
+    public void limparListaCategorias() {
+        listaCategorias.removeAll();
+        listaCategorias.revalidate();
+        listaCategorias.repaint();
+    }
+
+    
+    public void inserirLinhaCategoria(Long idCategoria, String descricao,
+                                      ActionListener listenerEditar,
+                                      ActionListener listenerExcluir) {
+        // Painel horizontal para esta linha
+        JPanel linha = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+
+        // Label com o nome da categoria
+        JLabel lbl = new JLabel(descricao);
+        lbl.setName("lbl_" + idCategoria);
+
+        // Botões
+        JButton btnEditar = new JButton("Editar");
+        JButton btnExcluir = new JButton("Excluir");
+
+        btnEditar.addActionListener(listenerEditar);
+        btnExcluir.addActionListener(listenerExcluir);
+
+        linha.add(lbl);
+        linha.add(btnEditar);
+        linha.add(btnExcluir);
+
+        // Nomeamos a linha para podermos encontrá-la depois
+        linha.setName("linha_" + idCategoria);
+
+        listaCategorias.add(linha);
+        listaCategorias.revalidate();
+        listaCategorias.repaint();
+    }
+
+    public void atualizarLinhaDescricao(Long idCategoria, String novaDescricao) {
+        for (Component comp : listaCategorias.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel linha = (JPanel) comp;
+                if (("linha_" + idCategoria).equals(linha.getName())) {
+                    // Dentro dessa linha, o primeiro (índice 0) é sempre o JLabel
+                    Component c0 = linha.getComponent(0);
+                    if (c0 instanceof JLabel) {
+                        ((JLabel) c0).setText(novaDescricao);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public void removerLinhaCategoria(Long idCategoria) {
+        for (Component comp : listaCategorias.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel linha = (JPanel) comp;
+                if (("linha_" + idCategoria).equals(linha.getName())) {
+                    listaCategorias.remove(linha);
+                    listaCategorias.revalidate();
+                    listaCategorias.repaint();
+                    break;
+                }
+            }
+        }
+    }
 }

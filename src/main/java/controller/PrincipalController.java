@@ -1,259 +1,155 @@
 package controller;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import java.awt.event.*;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 
 import view.MainFrame;
 import view.TelaPrincipal;
 import view.TelaResumoFinanceiro;
 import view.TelaEditarCategorias;
-import view.TelaEditarTransacao;
 import view.TelaAdicionarTransacao;
+import view.TelaEditarTransacao;
+
+import model.entity.Categoria;
 import model.entity.Transacao;
-import model.entity.Usuario;
 import model.service.GerenciadorCategorias;
 import model.service.GerenciadorFinanceiro;
 import model.service.GerenciadorUsuario;
-import util.ModeloTabelaTransacoes;
 
+/**
+ * Controller da TelaPrincipal. Registra listeners para abrir, sob demanda,
+ * as demais janelas (ResumoFinanceiro, EditarCategorias, AdicionarTransacao, EditarTransacao).
+ */
 public class PrincipalController {
-	private MainFrame mainFrame;
-	private TelaPrincipal view;
-	private TelaResumoFinanceiro telaResumo;
-	private TelaEditarCategorias telaCategorias;
-	private TelaAdicionarTransacao telaTransacao;
-	private TelaEditarTransacao telaEditarTransacao;
-	private GerenciadorCategorias gerenciadorCategorias;
-	private GerenciadorFinanceiro gerenciadorFinanceiro;
-	private GerenciadorUsuario gerenciadorUsuario;
-	private CategoriasController categoriasController;
-	
-	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaResumoFinanceiro telaResumo, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario, CategoriasController categoriasController) {
-		this.mainFrame = mainFrame;
-		this.view = telaPrincipal;
-		this.telaResumo = telaResumo;
-		this.telaCategorias = telaCategorias;
-		this.telaTransacao = telaTransacao;
-		this.telaEditarTransacao = telaEditarTransacao;
-		this.gerenciadorCategorias = gerenciadorCategorias;
-		this.gerenciadorFinanceiro = gerenciadorFinanceiro;
-		this.gerenciadorUsuario = gerenciadorUsuario;
-		this.categoriasController = categoriasController;
-		
-		initControllers();
-	}
-	
-	public void initControllers() {
-		carregarTabelaTransacoes();
-		
-		view.getBotaoSair().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				confirmarSaida();
-			}
-		});
-		
-		view.getBotaoResumoFinanceiro().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mostrarTelaResumoFinanceiro();
-			}
-		});
-		
-		view.getBotaoEditarCategorias().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				mostrarTelaEditarCategorias();
-			}
-		});
-		
-		view.getBotaoAdicionarTransacao().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				telaTransacao.atualizarListaCategorias(gerenciadorCategorias.listarTodasCategorias());
-				telaTransacao.setVisible(true);
-			}
-		});
-		
-		view.getBotaoLimparFiltros().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				limparFiltros();
-			}
-		});
-		
-		view.getBotaoAplicarFiltros().addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				aplicarFiltros();
-			}
-		});
-		
-		view.getTabelaTransacoes().addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				telaEditarTransacao.atualizarListaCategorias(gerenciadorCategorias.listarTodasCategorias());
-				abrirTelaEditarTransacao(e);
-			}
-		});
-	}
-	
-	private void carregarTabelaTransacoes() {
-        Usuario u = gerenciadorUsuario.getUsuarioAtual();
-        
-        if (u == null) {
-        	return;
-        }
 
-        List<Transacao> todas = gerenciadorFinanceiro.listarTransacoesPorUsuario(u.getId());
+    private final MainFrame mainFrame;
+    private final TelaPrincipal telaPrincipal;
+    private final GerenciadorCategorias gerenciadorCategorias;
+    private final GerenciadorFinanceiro gerenciadorFinanceiro;
+    private final GerenciadorUsuario gerenciadorUsuario;
 
-        view.substituirTabelaTransacoes(todas);
+    public PrincipalController(
+            MainFrame mainFrame,
+            TelaPrincipal telaPrincipal,
+            GerenciadorCategorias gerenciadorCategorias,
+            GerenciadorFinanceiro gerenciadorFinanceiro,
+            GerenciadorUsuario gerenciadorUsuario
+    ) {
+        this.mainFrame = mainFrame;
+        this.telaPrincipal = telaPrincipal;
+        this.gerenciadorCategorias = gerenciadorCategorias;
+        this.gerenciadorFinanceiro = gerenciadorFinanceiro;
+        this.gerenciadorUsuario = gerenciadorUsuario;
 
-        double saldo = gerenciadorUsuario.getUsuarioAtual().getSaldo();
-        view.setSaldo(formatarMoeda(saldo));
+        initController();
     }
-	
-	private String formatarMoeda(double valor) {
-        DecimalFormat df = new DecimalFormat("R$ #,##0.00");
-        return df.format(valor);
+
+    private void initController() {
+        // 1) Ao clicar em “Resumo Financeiro”, cria a tela e seu controller
+        telaPrincipal.getBotaoResumoFinanceiro().addActionListener(e -> abrirTelaResumo());
+
+        // 2) Ao clicar em “Editar Categorias”, cria a tela e seu controller
+        telaPrincipal.getBotaoEditarCategorias().addActionListener(e -> abrirTelaEditarCategorias());
+
+        // 3) Ao clicar em “Adicionar Transação”, cria a tela e seu controller
+        telaPrincipal.getBotaoAdicionarTransacao().addActionListener(e -> abrirTelaAdicionarTransacao());
+
+        // 4) Ao clicar em “Editar Transação”, cria a tela e seu controller
+        telaPrincipal.getTabelaTransacoes().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Verifica se foram dois cliques no mesmo ponto
+                if (e.getClickCount() == 2 && !e.isConsumed()) {
+                    e.consume();
+                    abrirTelaEditarTransacao();
+                }
+            }
+        });
+
+        // 5) Ao clicar em “Logout”
+        telaPrincipal.getBotaoSair().addActionListener(e -> fazerLogout());
     }
-	
-	public void confirmarSaida() {
-		int confirmarSaida = JOptionPane.showConfirmDialog(view, "Tem certeza que deseja sair da sua conta?", "Confirmação de saída", JOptionPane.YES_NO_OPTION);
-		
-		if(confirmarSaida == JOptionPane.YES_OPTION) {
-			gerenciadorUsuario.setUsuarioAtual(null);				
-			mainFrame.mostrarTela("login");
-		}
-	}
-	
-	public void mostrarTelaResumoFinanceiro() {
-		telaResumo.inicializarSelectCategorias(gerenciadorCategorias.listarTodasCategorias());
-		telaResumo.setVisible(true);
-	}
-	
-	public void mostrarTelaEditarCategorias() {
-		categoriasController.carregarCategoriasExistentes(gerenciadorCategorias.listarTodasCategorias());
-		telaCategorias.setVisible(true);
-	}
-	
-	public void limparFiltros() {
-		view.getInputDataInicial().setText("");
-        view.getInputDataFinal().setText("");
-        view.getSelectClassificacao().setSelectedIndex(0);
-        view.getSelectCategoria().setSelectedIndex(0);
 
-        carregarTabelaTransacoes();
-	}
-	
-	public void aplicarFiltros() {
-		String conteudoDataInicial = view.getInputDataInicial().getText();
-		String conteudoDataFinal = view.getInputDataFinal().getText();
-		String conteudoSelectClassificacao = (String)view.getSelectClassificacao().getSelectedItem();
-		String conteudoSelectCategoria = (String)view.getSelectCategoria().getSelectedItem();
-		
-		if(conteudoDataInicial.isEmpty() &&
-		   conteudoDataFinal.isEmpty() &&
-		   conteudoSelectClassificacao.equals("Classificação") &&
-		   conteudoSelectCategoria.equals("Categoria")) {
-			JOptionPane.showMessageDialog(view, "Forneça algum parâmetro para filtrar as transações.", "Nenhum filtro selecionado", JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		
-		if(!conteudoSelectCategoria.equals("Categoria") && !gerenciadorCategorias.isThereCategoria(conteudoSelectCategoria)) {
-			JOptionPane.showMessageDialog(view, "Algo deu errado ao filtrar por essa categoria.", "Erro ao filtrar por categoria", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-		
-		LocalDate dataIni = null, dataFim = null;
-		DateTimeFormatter dtFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		
-        try {
-            if (!conteudoDataInicial.isEmpty()) {
-                dataIni = LocalDate.parse(conteudoDataInicial, dtFormatter);
-            }
-            if (!conteudoDataFinal.isEmpty()) {
-                dataFim = LocalDate.parse(conteudoDataFinal, dtFormatter);
-            }
-        } catch (DateTimeParseException e) {
-            JOptionPane.showMessageDialog(view, "Formato de data inválido. Use dd/MM/yyyy", "Erro de Filtro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (dataIni != null && dataFim != null && dataFim.isBefore(dataIni)) {
-        	JOptionPane.showMessageDialog(view, "Data final não pode ser anterior à data inicial.", "Erro de Filtro", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        String categoriaFiltro = null;
-        if (!"Categoria".equals(conteudoSelectClassificacao)) {
-            categoriaFiltro = conteudoSelectClassificacao;
-        }
-
-        String classificacaoFiltro = null;
-        if (!"Classificação".equals(conteudoSelectCategoria)) {
-            classificacaoFiltro = conteudoSelectCategoria;
-        }
-        
-        Usuario u = gerenciadorUsuario.getUsuarioAtual();
-        List<Transacao> filtradas = gerenciadorFinanceiro.buscarTransacoesFiltradas(
-                u.getId(),
-                dataIni, dataFim,
-                classificacaoFiltro,
-                categoriaFiltro
+    /**
+     * Cria e exibe a TelaResumoFinanceiro e instancia seu controller.
+     */
+    private void abrirTelaResumo() {
+        TelaResumoFinanceiro tela = new TelaResumoFinanceiro(mainFrame);
+        new ResumoFinanceiroController(
+            tela,
+            gerenciadorCategorias,
+            gerenciadorFinanceiro,
+            gerenciadorUsuario
         );
+        tela.setVisible(true);
+    }
 
-        view.substituirTabelaTransacoes(filtradas);
-        
-        double saldo = gerenciadorUsuario.getUsuarioAtual().getSaldo();
-        view.setSaldo(formatarMoeda(saldo));
-        
-        double receitasIntervalo = 0.0;
-        double despesasIntervalo = 0.0;
+    /**
+     * Cria e exibe a TelaEditarCategorias e instancia seu controller,
+     * que já carregará as categorias do banco.
+     */
+    private void abrirTelaEditarCategorias() {
+        TelaEditarCategorias tela = new TelaEditarCategorias(mainFrame);
+        new CategoriasController(
+            mainFrame,
+            tela,
+            gerenciadorCategorias
+        );
+        tela.setVisible(true);
+    }
 
-        for (Transacao t : filtradas) {
-            if ("Receita".equalsIgnoreCase(t.getClassificacao())) {
-                receitasIntervalo += t.getValor();
-            } else {
-                despesasIntervalo += t.getValor();
-            }
+    /**
+     * Cria e exibe a TelaAdicionarTransacao e instancia seu controller.
+     */
+    private void abrirTelaAdicionarTransacao() {
+        TelaAdicionarTransacao tela = new TelaAdicionarTransacao(mainFrame);
+        new TransacoesController(
+            tela,
+            telaPrincipal,
+            gerenciadorUsuario,
+            gerenciadorCategorias,
+            gerenciadorFinanceiro
+        );
+        tela.setVisible(true);
+    }
+
+    private void abrirTelaEditarTransacao() {
+        Transacao selecionada = telaPrincipal.getTransacaoSelecionada();
+        if (selecionada == null) {
+            JOptionPane.showMessageDialog(
+                telaPrincipal,
+                "Selecione uma transação para editar.",
+                "Atenção",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
         }
-	    
-	    view.setDespesasIntervalo("R$ " + formatarMoeda(despesasIntervalo));
-	    view.setReceitasIntervalo("R$ " + formatarMoeda(receitasIntervalo));
-	}
+        TelaEditarTransacao tela = new TelaEditarTransacao(mainFrame);
+
+	     // 1) informa ao “view” qual transação está sendo editada
+	     tela.setTransacaoEmEdicao(selecionada);
+	     tela.atualizarListaCategorias(gerenciadorCategorias.listarCategorias());
+	     // 2) inicializa os campos (valor, descrição, classificação, categoria, data)
+	     tela.inicializarInputs(selecionada);
 	
-	public void abrirTelaEditarTransacao(MouseEvent e) {
-		JTable tabela = view.getTabelaTransacoes();
-		
-		if(e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-			e.consume();
-			
-			int linhaSelecionada = tabela.getSelectedRow();
-			
-			if(linhaSelecionada < 0) {
-				return;
-			}
-			
-			int linhaModelo = tabela.convertRowIndexToModel(linhaSelecionada);
-			ModeloTabelaTransacoes model = (ModeloTabelaTransacoes) tabela.getModel();
-		    Transacao transacao = model.getTransacaoAt(linhaModelo);
-			
-			telaEditarTransacao.inicializarInputs(transacao);
-			telaEditarTransacao.setTransacaoEmEdicao(transacao);
-			telaEditarTransacao.setVisible(true);
-		}
-	}
+	     // 3) agora sim, cria o controller e exibe a janela
+	     new EditarTransacaoController(
+	         tela,
+	         gerenciadorUsuario,
+	         gerenciadorFinanceiro,
+	         gerenciadorCategorias,
+	         telaPrincipal
+	     );
+	     tela.setVisible(true);
+    }
+
+    private void fazerLogout() {
+        gerenciadorUsuario.setUsuarioAtual(null);
+        mainFrame.getTelaPrincipal().setVisible(false);
+        mainFrame.mostrarTela("login");
+    }
 }

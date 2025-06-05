@@ -19,6 +19,7 @@ public class TelaAdicionarTransacao extends JFrame {
 	private JSpinner dataInput;
 	private JTextField valorInput;
 	private JTextArea descricaoInput;
+	private JButton botaoCancelar;
 	private JButton botaoAdicionar;
 	
 	public TelaAdicionarTransacao(MainFrame mainFrame) {
@@ -126,7 +127,7 @@ public class TelaAdicionarTransacao extends JFrame {
 		JPanel botoesRodapeContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 0));
 		botoesRodapeContainer.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
 		
-		JButton botaoCancelar = new JButton("Cancelar");
+		botaoCancelar = new JButton("Cancelar");
 		botaoCancelar.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		botoesRodapeContainer.add(botaoCancelar);
 		
@@ -161,6 +162,10 @@ public class TelaAdicionarTransacao extends JFrame {
 		return descricaoInput;
 	}
 	
+	public JButton getBotaoCancelar() {
+		return botaoCancelar;
+	}
+
 	public JButton getBotaoAdicionar() {
 		return botaoAdicionar;
 	}

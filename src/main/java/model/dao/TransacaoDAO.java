@@ -1,4 +1,3 @@
-// src/main/java/dao/TransacaoDAO.java
 package model.dao;
 
 import model.entity.Transacao;
@@ -9,31 +8,50 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class TransacaoDAO extends GenericDAO<Transacao, Long> {
+
     public TransacaoDAO() {
         super(Transacao.class);
     }
 
-    public boolean existePorUsuarioECategoria(Long usuarioId, String descricaoCategoria) {
+    public List<Transacao> buscarPorUsuario(Long usuarioId) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "select count(t.id) from Transacao t "
-                       + "where t.usuario.id = :uid and t.categoria.descricao = :descCat";
-            Long count = session.createQuery(hql, Long.class)
-                                .setParameter("uid", usuarioId)
-                                .setParameter("descCat", descricaoCategoria)
-                                .uniqueResult();
-            return count != null && count > 0;
+            String hql = "FROM Transacao t WHERE t.usuario.id = :uid ORDER BY t.data DESC";
+            return session.createQuery(hql, Transacao.class)
+                          .setParameter("uid", usuarioId)
+                          .list();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar transações por usuário: " + e.getMessage(), e);
         }
     }
 
     public List<Transacao> buscarPorUsuarioEPeriodo(Long usuarioId, LocalDate inicio, LocalDate fim) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "from Transacao t where t.usuario.id = :uid "
-                       + "and t.data between :ini and :fim order by t.data desc";
+            String hql = "FROM Transacao t "
+                       + "WHERE t.usuario.id = :uid "
+                       + "  AND t.data BETWEEN :ini AND :fim "
+                       + "ORDER BY t.data DESC";
             return session.createQuery(hql, Transacao.class)
                           .setParameter("uid", usuarioId)
                           .setParameter("ini", inicio)
                           .setParameter("fim", fim)
                           .list();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar transações por período: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean existePorUsuarioECategoria(Long usuarioId, String descricaoCategoria) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(t) FROM Transacao t "
+                       + "WHERE t.usuario.id = :uid "
+                       + "  AND t.categoria.descricao = :dc";
+            Long qtd = session.createQuery(hql, Long.class)
+                              .setParameter("uid", usuarioId)
+                              .setParameter("dc", descricaoCategoria)
+                              .uniqueResult();
+            return (qtd != null && qtd > 0);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao verificar existência de transação: " + e.getMessage(), e);
         }
     }
 }

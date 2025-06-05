@@ -14,17 +14,30 @@ public class GenericDAO<T, ID extends Serializable> {
     public GenericDAO(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
-
-    public T salvarOuAtualizar(T entidade) {
+    
+    public void salvar(T entidade) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            T managed = session.merge(entidade);
+            session.persist(entidade);
             tx.commit();
-            return managed;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            throw e;
+            throw new RuntimeException("Erro ao salvar " + entityClass.getSimpleName() + ": " + e.getMessage(), e);
+        }
+    }
+
+    public T atualizar(T entidade) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            @SuppressWarnings("unchecked")
+            T merged = (T) session.merge(entidade);
+            tx.commit();
+            return merged;
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw new RuntimeException("Erro ao atualizar " + entityClass.getSimpleName() + ": " + e.getMessage(), e);
         }
     }
 
@@ -32,25 +45,30 @@ public class GenericDAO<T, ID extends Serializable> {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.remove(session.contains(entidade) ? entidade : session.merge(entidade));
+            T managed = session.contains(entidade) ? entidade : (T) session.merge(entidade);
+            session.remove(managed);
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
-            throw e;
+            throw new RuntimeException("Erro ao excluir " + entityClass.getSimpleName() + ": " + e.getMessage(), e);
         }
     }
 
     public T buscarPorId(ID id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(entityClass, id);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar " + entityClass.getSimpleName() + " por id: " + e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
     public List<T> buscarTodos() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "from " + entityClass.getSimpleName();
+            String hql = "FROM " + entityClass.getSimpleName();
             return session.createQuery(hql, entityClass).list();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao buscar todos de " + entityClass.getSimpleName() + ": " + e.getMessage(), e);
         }
     }
 }

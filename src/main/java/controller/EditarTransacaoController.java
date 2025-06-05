@@ -8,11 +8,11 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 
 import model.entity.Categoria;
 import model.entity.Transacao;
@@ -20,6 +20,7 @@ import model.entity.Usuario;
 import model.service.GerenciadorCategorias;
 import model.service.GerenciadorFinanceiro;
 import model.service.GerenciadorUsuario;
+import model.util.DebugDatabasePrinter;
 import view.TelaEditarTransacao;
 import view.TelaPrincipal;
 
@@ -74,25 +75,26 @@ public class EditarTransacaoController {
 			return;
 		
 		Transacao transacaoRemover = view.getTransacaoEmEdicao();
+		long idTransacao = transacaoRemover.getId();
 		Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
 		
-		// remove a transação da lista do usuário e da tabela na tela principal
-		usuarioAtual.removerTransacao(transacaoRemover);
-		telaPrincipal.removerTransacaoTabela(transacaoRemover);
+		try {
+	        // CHAMADA NO SERVIÇO: ele já busca NOVAMENTE do BD
+	        // (não passe a instância “detached”, apenas o ID).
+	        gerenciadorFinanceiro.excluirTransacao(usuarioAtual.getId(), idTransacao);
+
+	        // Depois de excluir, recarregue a lista de transações na tela principal:
+	        telaPrincipal.removerTransacaoTabela(transacaoRemover);
+
+	        JOptionPane.showMessageDialog(view, "Transação removida com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	        view.dispose();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        JOptionPane.showMessageDialog(view, "Erro ao remover transação: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+	    }
 		
-		// atualiza o saldo do usuário de acordo com o tipo de transação
-		if(transacaoRemover.getClassificacao().equals("Receita"))
-			gerenciadorFinanceiro.retirarSaldo(usuarioAtual, transacaoRemover.getValor());
-		else
-			gerenciadorFinanceiro.adicionarSaldo(usuarioAtual, transacaoRemover.getValor());
-		
-		// atualiza saldo visualmente na tela principal
-		DecimalFormat formatadorSaldo = new DecimalFormat("#,##0.00");
-		String novoSaldo = formatadorSaldo.format(usuarioAtual.getSaldo());
-		telaPrincipal.atualizarSaldo(novoSaldo);
-		
-		view.bloquearCampos();
-		view.dispose();
+		DebugDatabasePrinter.imprimirTodasTabelas();
 	}
 	
 	public void clickBotaoEditar(ActionEvent e) {
@@ -119,68 +121,122 @@ public class EditarTransacaoController {
 		
 		// validar campos preenchidos
 		if(conteudoData.isEmpty() || conteudoValor.isEmpty()) {
-			JOptionPane.showMessageDialog(view, "Preencha todos os campos para adicionar a transação.", "Erro ao adicionar transação", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(view, "Preencha todos os campos para salvar a transação.", "Erro ao salvar transação", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		// validar classificacao
 		if(classificacaoSelecionada.equals("Classificação")) {
-			JOptionPane.showMessageDialog(view, "Defina a classificação (receita ou despesa) da transação para adicionar.", "Erro ao adicionar transação", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(view, "Defina a classificação (receita ou despesa) da transação para salvar.", "Erro ao salvar transação", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		// validar categoria
 		if(categoriaSelecionada.equals("Categoria")) {
-			JOptionPane.showMessageDialog(view, "Defina a categoria da transação para adicionar.", "Erro ao adicionar transação", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(view, "Defina a categoria da transação para salvar.", "Erro ao salvar transação", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
 		// validar existência da categoria
-		if(!gerenciadorCategorias.isThereCategoria(categoriaSelecionada)) {
-			JOptionPane.showMessageDialog(view, "Algo deu errado e não conseguimos encontrar essa categoria cadastrada, tente fechar esta tela e tentar novamente.", "Erro ao adicionar transação", JOptionPane.ERROR_MESSAGE);
+		Categoria novaCategoria = gerenciadorCategorias.getInstanciaCategoria(categoriaSelecionada);
+        if (novaCategoria == null) {
+            JOptionPane.showMessageDialog(view, "Categoria não encontrada.", "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+		
+		// validar valor numérico
+		double valorTransacaoDouble;
+		try {
+			valorTransacaoDouble = Double.parseDouble(conteudoValor.replace(",", "."));
+			if (valorTransacaoDouble <= 0) {
+				JOptionPane.showMessageDialog(view, "O valor deve ser maior que zero.", "Erro ao salvar transação", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		} catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(view, "Valor inválido. Use apenas números.", "Erro ao salvar transação", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
-		view.bloquearCampos();
+		try {
+			Transacao transacao = view.getTransacaoEmEdicao();
+			Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
+			
+			// Guarda os valores antigos para ajuste do saldo
+			String classificacaoAntiga = transacao.getClassificacao();
+			double valorAntigo = transacao.getValor();
+			
+			// Atualiza os campos da transação
+			Categoria categoriaTransacao = gerenciadorCategorias.getInstanciaCategoria(categoriaSelecionada);
+			Date dataDate = (Date)view.getDataInput().getValue();
+			LocalDate dataTransacao = dataDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+			
+			transacao.setData(dataTransacao);
+			transacao.setValor(valorTransacaoDouble);
+			transacao.setDescricao(conteudoDescricao);
+			transacao.setCategoria(categoriaTransacao);
+			transacao.setClassificacao(classificacaoSelecionada);
+			
+			// Persiste a transação atualizada no banco
+			gerenciadorFinanceiro.atualizarTransacao(transacao);
+			
+			// Calcula o ajuste do saldo baseado nas mudanças
+			double ajusteSaldo = calcularAjusteSaldo(classificacaoAntiga, valorAntigo, 
+													classificacaoSelecionada, valorTransacaoDouble);
+			
+			// Aplica o ajuste ao saldo do usuário
+			if (ajusteSaldo != 0) {
+				if (ajusteSaldo > 0) {
+					gerenciadorFinanceiro.adicionarSaldo(usuarioAtual, ajusteSaldo);
+				} else {
+					gerenciadorFinanceiro.retirarSaldo(usuarioAtual, Math.abs(ajusteSaldo));
+				}
+			}
+			
+			// Atualiza a tabela na tela principal
+			telaPrincipal.atualizarTransacaoTabela(transacao);
+			
+			// Atualiza o saldo visualmente
+			DecimalFormat formatadorSaldo = new DecimalFormat("#,##0.00");
+			String novoSaldo = formatadorSaldo.format(usuarioAtual.getSaldo());
+			telaPrincipal.atualizarSaldo(novoSaldo);
+			
+			view.bloquearCampos();
+			view.setModoEdicao(false);
+			view.setTextoBotaoEditar("Editar");
+			view.dispose();
+			
+			JOptionPane.showMessageDialog(view, "Transação atualizada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+			
+			model.util.DebugDatabasePrinter.imprimirTodasTabelas();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(view, "Erro ao salvar transação: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	/**
+	 * Calcula o ajuste necessário no saldo baseado nas mudanças na transação
+	 */
+	private double calcularAjusteSaldo(String classificacaoAntiga, double valorAntigo, 
+									  String classificacaoNova, double valorNovo) {
+		double ajuste = 0;
 		
-		Transacao transacao = view.getTransacaoEmEdicao();
-		Transacao transacaoAntiga = Transacao.copiarTransacao(transacao, gerenciadorUsuario.getUsuarioAtual());
-		Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
-		
-		double valorTransacaoDouble = Double.parseDouble(conteudoValor.replace(",", "."));
-		Categoria categoriaTransacao = gerenciadorCategorias.getInstanciaCategoria(categoriaSelecionada);
-		Date dataDate = (Date)view.getDataInput().getValue();
-		LocalDate dataTransacao = dataDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-		
-		transacao.setData(dataTransacao);
-		transacao.setValor(valorTransacaoDouble);
-		transacao.setDescricao(conteudoDescricao);
-		transacao.setCategoria(categoriaTransacao);
-		transacao.setClassificacao(classificacaoSelecionada);
-		
-		telaPrincipal.atualizarTransacaoTabela(transacao);
-		
-		if(transacaoAntiga.getClassificacao() != transacao.getClassificacao()) {
-			if(transacao.getClassificacao().equals("Receita"))
-				gerenciadorFinanceiro.adicionarSaldo(usuarioAtual, 2*transacaoAntiga.getValor());
-			else
-				gerenciadorFinanceiro.retirarSaldo(usuarioAtual, 2*transacaoAntiga.getValor());
+		// Primeiro, desfaz o efeito da transação antiga
+		if ("Receita".equalsIgnoreCase(classificacaoAntiga)) {
+			ajuste -= valorAntigo; // Remove a receita antiga
+		} else {
+			ajuste += valorAntigo; // Remove a despesa antiga (adiciona de volta ao saldo)
 		}
 		
-		double diferencaValor = transacaoAntiga.getValor() - transacao.getValor();
+		// Depois, aplica o efeito da transação nova
+		if ("Receita".equalsIgnoreCase(classificacaoNova)) {
+			ajuste += valorNovo; // Adiciona a nova receita
+		} else {
+			ajuste -= valorNovo; // Adiciona a nova despesa (subtrai do saldo)
+		}
 		
-		if(transacao.getClassificacao().equals("Receita"))
-			gerenciadorFinanceiro.retirarSaldo(usuarioAtual, diferencaValor);
-		else
-			gerenciadorFinanceiro.adicionarSaldo(usuarioAtual, diferencaValor);
-		
-		DecimalFormat formatadorSaldo = new DecimalFormat("#,##0.00");
-		String novoSaldo = formatadorSaldo.format(usuarioAtual.getSaldo());
-		telaPrincipal.atualizarSaldo(novoSaldo);
-		
-		view.setModoEdicao(false);
-		view.setTextoBotaoEditar("Editar");
-		view.dispose();
+		return ajuste;
 	}
 	
 	public void fecharJanela() {
