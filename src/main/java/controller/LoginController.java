@@ -47,7 +47,7 @@ public class LoginController {
 	}
 	
 	private void validarLogin() {
-        String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
+        String nome = telaLogin.getUserInput().getText().trim();
         String senha = telaLogin.getPasswordInput().getText().trim();
         
         if (nome.isEmpty() || senha.isEmpty()) {

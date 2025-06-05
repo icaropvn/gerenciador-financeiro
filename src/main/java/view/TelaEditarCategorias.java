@@ -178,4 +178,10 @@ public class TelaEditarCategorias extends JFrame {
 			botaoExcluir.setEnabled(true);
 		}
 	}
+	    
+	public void limparListaCategorias() {
+		listaCategorias.removeAll();
+	    listaCategorias.revalidate();
+	    listaCategorias.repaint();
+	}
 }

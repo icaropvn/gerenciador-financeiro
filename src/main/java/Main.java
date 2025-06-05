@@ -28,11 +28,11 @@ public class Main {
 		// instanciamento dos controllers das telas
 		LoginController loginController = new LoginController(mainFrame, mainFrame.getTelaLogin(), gerenciadorUsuario, gerenciadorFinanceiro, mainFrame.getTelaPrincipal());
 		CadastroController cadastroController = new CadastroController(mainFrame, mainFrame.getTelaCadastro(), gerenciadorUsuario);
-		PrincipalController principalController = new PrincipalController(mainFrame, mainFrame.getTelaPrincipal(), telaResumo, telaCategorias, telaTransacoes, telaEditarTransacoes, gerenciadorCategorias, gerenciadorFinanceiro, gerenciadorUsuario);
 		ResumoFinanceiroController resumoFinanceiroController = new ResumoFinanceiroController(telaResumo, gerenciadorCategorias, gerenciadorFinanceiro, gerenciadorUsuario);
 		CategoriasController categoriasController = new CategoriasController(telaCategorias, gerenciadorCategorias, gerenciadorUsuario, mainFrame.getTelaPrincipal());
 		TransacoesController transacoesController = new TransacoesController(telaTransacoes, mainFrame.getTelaPrincipal(), gerenciadorUsuario, gerenciadorCategorias, gerenciadorFinanceiro);
 		EditarTransacaoController editarTransacaoController = new EditarTransacaoController(telaEditarTransacoes, gerenciadorUsuario, gerenciadorFinanceiro, gerenciadorCategorias, mainFrame.getTelaPrincipal());
+		PrincipalController principalController = new PrincipalController(mainFrame, mainFrame.getTelaPrincipal(), telaResumo, telaCategorias, telaTransacoes, telaEditarTransacoes, gerenciadorCategorias, gerenciadorFinanceiro, gerenciadorUsuario, categoriasController);
 		
 		mainFrame.setVisible(true);
 	}

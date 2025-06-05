@@ -38,8 +38,9 @@ public class PrincipalController {
 	private GerenciadorCategorias gerenciadorCategorias;
 	private GerenciadorFinanceiro gerenciadorFinanceiro;
 	private GerenciadorUsuario gerenciadorUsuario;
+	private CategoriasController categoriasController;
 	
-	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaResumoFinanceiro telaResumo, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario) {
+	public PrincipalController(MainFrame mainFrame, TelaPrincipal telaPrincipal, TelaResumoFinanceiro telaResumo, TelaEditarCategorias telaCategorias, TelaAdicionarTransacao telaTransacao, TelaEditarTransacao telaEditarTransacao, GerenciadorCategorias gerenciadorCategorias, GerenciadorFinanceiro gerenciadorFinanceiro, GerenciadorUsuario gerenciadorUsuario, CategoriasController categoriasController) {
 		this.mainFrame = mainFrame;
 		this.view = telaPrincipal;
 		this.telaResumo = telaResumo;
@@ -49,6 +50,7 @@ public class PrincipalController {
 		this.gerenciadorCategorias = gerenciadorCategorias;
 		this.gerenciadorFinanceiro = gerenciadorFinanceiro;
 		this.gerenciadorUsuario = gerenciadorUsuario;
+		this.categoriasController = categoriasController;
 		
 		initControllers();
 	}
@@ -143,6 +145,7 @@ public class PrincipalController {
 	}
 	
 	public void mostrarTelaEditarCategorias() {
+		categoriasController.carregarCategoriasExistentes(gerenciadorCategorias.listarTodasCategorias());
 		telaCategorias.setVisible(true);
 	}
 	

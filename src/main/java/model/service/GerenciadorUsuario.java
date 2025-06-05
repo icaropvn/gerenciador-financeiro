@@ -24,7 +24,7 @@ public class GerenciadorUsuario {
     }
 	
 	public Usuario validarLogin(String nome, String senha) {
-        return usuarioDAO.buscarPorNomeESenha(nome, senha);
+        return usuarioDAO.buscarPorNomeESenha(nome, CriptografarSenha.criptografarSenha(senha));
     }
 	
 	public List<Usuario> listarTodosUsuarios() {

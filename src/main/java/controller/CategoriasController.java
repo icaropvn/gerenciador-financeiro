@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import model.dao.TransacaoDAO;
+import model.entity.Categoria;
 import model.entity.Usuario;
 import model.service.GerenciadorCategorias;
 import model.service.GerenciadorCategorias.TipoVerificacao;
@@ -134,6 +135,7 @@ public class CategoriasController {
 			return;
 		}
 		
+		descricaoOriginal = CapitalizeString.capitalize(descricaoOriginal);
 		novoNomeCategoria = CapitalizeString.capitalize(novoNomeCategoria);
 		
 		// valida a disponibilidade do novo nome
@@ -142,7 +144,7 @@ public class CategoriasController {
 			return;
 		}
 		
-		gerenciador.editarCategoria(novoNomeCategoria, descricaoOriginal);
+		gerenciador.editarCategoria(descricaoOriginal, novoNomeCategoria);
 		
 		botaoEditar.putClientProperty("categoria", novoNomeCategoria);
 		botaoExcluir.putClientProperty("categoria", novoNomeCategoria);
@@ -216,5 +218,12 @@ public class CategoriasController {
 				validarEdicaoCategoria(inputNomeCategoria, botaoEditar, botaoExcluir);
 			}
 		};
+	}
+	
+	public void carregarCategoriasExistentes(List<Categoria> categorias) {
+		view.limparListaCategorias();
+	    
+	    for(Categoria categoria : categorias)
+	    	view.atualizarListaAdicao(categoria.getDescricao(), getListenerBotaoEditar(), getListenerBotaoExcluir());
 	}
 }
