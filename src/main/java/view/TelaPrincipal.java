@@ -19,6 +19,8 @@ import java.util.Locale;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.net.URL;
+
 import model.entity.Categoria;
 import model.entity.Transacao;
 import util.RegExData;
@@ -31,7 +33,7 @@ public class TelaPrincipal extends JPanel {
 	private JLabel despesas;
 	private JLabel receitas;
 	private JButton botaoSair;
-	
+
 	private JButton botaoResumoFinanceiro;
 	private JButton botaoEditarCategorias;
 	private JButton botaoAdicionarTransacao;
@@ -42,32 +44,36 @@ public class TelaPrincipal extends JPanel {
 	private JButton botaoAplicarFiltros;
 	private JButton botaoLimparFiltros;
 	private JTable tabelaTransacoes;
-	
+
 	public TelaPrincipal() {
 		setLayout(new BorderLayout());
-		
+
 		initComponents();
 	}
-	
+
 	public void initComponents() {
 		initPainelResumo();
 		initPainelPrincipal();
 	}
-	
+
 	public void initPainelResumo() {
 		JPanel painelRaiz = new JPanel(new BorderLayout());
 		painelRaiz.setBackground(Color.decode("#e0e0e0"));
 		painelRaiz.setOpaque(true);
-		
+
 		JPanel painelHeader = new JPanel(new BorderLayout());
 		painelHeader.setOpaque(false);
 		painelHeader.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
-		
+
 		JPanel headerEsquerda = new JPanel();
 		headerEsquerda.setOpaque(false);
 		headerEsquerda.setLayout(new BoxLayout(headerEsquerda, BoxLayout.Y_AXIS));
-		
-		ImageIcon imagemLogo = new ImageIcon(TelaPrincipal.class.getResource("../resources/centsable-logo.png"));
+
+		URL logoUrl = getClass().getClassLoader().getResource("centsable-logo.png");
+		if (logoUrl == null) {
+		    System.err.println("Recurso centsable-logo.png não encontrado no classpath");
+		}
+		ImageIcon imagemLogo = logoUrl != null ? new ImageIcon(logoUrl) : new ImageIcon();
 		ImageIcon logoRedimensionado = redimensionarLogo(imagemLogo, 200, 100);
 		JLabel labelLogo = new JLabel(logoRedimensionado);
 		headerEsquerda.add(labelLogo);
