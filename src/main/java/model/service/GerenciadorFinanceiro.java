@@ -68,4 +68,22 @@ public class GerenciadorFinanceiro {
     public void atualizarTransacao(Transacao t) {
         new TransacaoDAO().atualizar(t);
     }
+    
+    public double calcularTotalReceitas(List<Transacao> lista) {
+        return lista.stream()
+                    .filter(t -> "Receita".equalsIgnoreCase(t.getClassificacao()))
+                    .mapToDouble(Transacao::getValor)
+                    .sum();
+    }
+
+    /**
+     * Dado um subconjunto de Transações, calcula o total de DESPESAS
+     * (soma de valores onde classificacao == "Despesa").
+     */
+    public double calcularTotalDespesas(List<Transacao> lista) {
+        return lista.stream()
+                    .filter(t -> "Despesa".equalsIgnoreCase(t.getClassificacao()))
+                    .mapToDouble(Transacao::getValor)
+                    .sum();
+    }
 }

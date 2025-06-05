@@ -80,6 +80,7 @@ public class CategoriasController {
 
             // Limpa campo de texto para próxima inclusão
             view.getInputNomeCategoria().setText("");
+            mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(
@@ -152,6 +153,7 @@ public class CategoriasController {
 
             // Atualiza o texto do JLabel na mesma linha
             view.atualizarLinhaDescricao(categoriaId, atualizada.getDescricao());
+            mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(
@@ -182,6 +184,7 @@ public class CategoriasController {
             gerenciadorCategorias.excluirCategoria(categoriaId);
             // Se tudo der certo, remove a linha gráfica da View
             view.removerLinhaCategoria(categoriaId);
+            mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 
         } catch (RuntimeException ex) {
             JOptionPane.showMessageDialog(
