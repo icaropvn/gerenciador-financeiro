@@ -10,10 +10,6 @@ import view.TelaEditarCategorias;
 import model.entity.Categoria;
 import model.service.GerenciadorCategorias;
 
-/**
- * Controller para gerenciar operações de adicionar, editar e excluir categorias
- * na tela de edição de categorias.
- */
 public class CategoriasController {
 
     private final MainFrame mainFrame;
@@ -30,13 +26,10 @@ public class CategoriasController {
     }
 
     private void initController() {
-        // 1) Carregar todas as categorias existentes quando a tela for exibida
         carregarCategoriasExistentes();
 
-        // 2) Escuta o botão “Adicionar”
         view.getBotaoAdicionar().addActionListener(e -> adicionarCategoria());
 
-        // 3) Se houver botão “Voltar”, vincula ação (retornar para a tela principal)
         if (view.getBotaoVoltar() != null) {
             view.getBotaoVoltar().addActionListener(e -> {
                 view.dispose();
@@ -44,9 +37,6 @@ public class CategoriasController {
         }
     }
 
-    /**
-     * Carrega todas as categorias do banco e delega à View a atualização do painel.
-     */
     private void carregarCategoriasExistentes() {
         List<Categoria> categorias = gerenciadorCategorias.listarCategorias();
         view.limparListaCategorias();
@@ -55,10 +45,6 @@ public class CategoriasController {
         }
     }
 
-    /**
-     * Tenta adicionar nova categoria usando o texto do campo de entrada.
-     * Exibe erro em JOptionPane se falhar.
-     */
     private void adicionarCategoria() {
         String descricao = view.getInputNomeCategoria().getText().trim();
         if (descricao.isEmpty()) {
@@ -72,13 +58,10 @@ public class CategoriasController {
         }
 
         try {
-            // Serviço retorna a entidade persistida (com ID)
             Categoria nova = gerenciadorCategorias.adicionarCategoria(descricao);
-
-            // Adiciona apenas a nova linha na View (sem recarregar tudo)
+            
             adicionarLinhaNaView(nova);
 
-            // Limpa campo de texto para próxima inclusão
             view.getInputNomeCategoria().setText("");
             mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 
@@ -92,27 +75,17 @@ public class CategoriasController {
         }
     }
 
-    /**
-     * Cria uma linha gráfica na View para a categoria informada,
-     * incluindo os botões “Editar” e “Excluir” com os listeners corretos.
-     */
     private void adicionarLinhaNaView(Categoria categoria) {
         Long id = categoria.getId();
         String descricao = categoria.getDescricao();
 
-        // Listener para editar essa categoria
         ActionListener listenerEditar = e -> editarCategoria(id);
 
-        // Listener para excluir essa categoria
         ActionListener listenerExcluir = e -> excluirCategoria(id);
 
         view.inserirLinhaCategoria(id, descricao, listenerEditar, listenerExcluir);
     }
 
-    /**
-     * Altera a descrição da categoria com o ID informado.
-     * Abre um diálogo (JOptionPane.showInputDialog) para obter novo nome.
-     */
     private void editarCategoria(Long categoriaId) {
         Categoria atual = gerenciadorCategorias.buscarPorId(categoriaId);
         if (atual == null) {
@@ -133,7 +106,6 @@ public class CategoriasController {
         );
 
         if (novaDescricao == null) {
-            // Usuário cancelou o prompt
             return;
         }
         novaDescricao = novaDescricao.trim();
@@ -148,10 +120,8 @@ public class CategoriasController {
         }
 
         try {
-            // Tenta salvar a alteração
             Categoria atualizada = gerenciadorCategorias.editarCategoria(categoriaId, novaDescricao);
 
-            // Atualiza o texto do JLabel na mesma linha
             view.atualizarLinhaDescricao(categoriaId, atualizada.getDescricao());
             mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 
@@ -165,9 +135,6 @@ public class CategoriasController {
         }
     }
 
-    /**
-     * Exclui a categoria com o ID informado, após confirmação do usuário.
-     */
     private void excluirCategoria(Long categoriaId) {
         int resp = JOptionPane.showConfirmDialog(
             view,
@@ -182,7 +149,6 @@ public class CategoriasController {
 
         try {
             gerenciadorCategorias.excluirCategoria(categoriaId);
-            // Se tudo der certo, remove a linha gráfica da View
             view.removerLinhaCategoria(categoriaId);
             mainFrame.getTelaPrincipal().atualizarFiltroCategorias(gerenciadorCategorias.listarCategorias());
 

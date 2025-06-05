@@ -16,32 +16,27 @@ public class HibernateUtil {
 
     static {
         try {
-            // Criar diretório do banco se não existir
             File dbDir = new File("database");
             if (!dbDir.exists()) {
                 dbDir.mkdirs();
             }
 
-            // Configuração do Hibernate
             Configuration configuration = new Configuration();
             configuration.configure("hibernate.cfg.xml");
             
-            // Adicionar as classes de entidade explicitamente
             configuration.addAnnotatedClass(Usuario.class);
             configuration.addAnnotatedClass(Categoria.class);
             configuration.addAnnotatedClass(Transacao.class);
 
-            // Construir o ServiceRegistry
             ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                     .applySettings(configuration.getProperties())
                     .build();
 
-            // Construir a SessionFactory
             sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             
         } catch (Throwable ex) {
             System.err.println("Falha ao criar SessionFactory: " + ex);
-            ex.printStackTrace(); // Para ver o erro completo
+            ex.printStackTrace();
             throw new ExceptionInInitializerError(ex);
         }
     }
@@ -51,7 +46,7 @@ public class HibernateUtil {
     }
 
     public static void shutdown() {
-        if (sessionFactory != null) {
+        if(sessionFactory != null) {
             sessionFactory.close();
         }
     }

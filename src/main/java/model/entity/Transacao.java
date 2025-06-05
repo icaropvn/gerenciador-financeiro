@@ -31,8 +31,6 @@ public class Transacao {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
-    /****************** Construtores ******************/
-
     public Transacao() {}
 
     public Transacao(String classificacao, Double valor, Categoria categoria, LocalDate data, String descricao, Usuario usuario) {

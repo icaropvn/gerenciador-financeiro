@@ -57,7 +57,6 @@ public class LoginController {
         String nome = telaLogin.getUserInput().getText().trim().toLowerCase();
         String senha = telaLogin.getPasswordInput().getText().trim();
 
-        // Validação básica de preenchimento
         if (nome.isEmpty() || senha.isEmpty()) {
             JOptionPane.showMessageDialog(
                 telaLogin,
@@ -72,7 +71,6 @@ public class LoginController {
             Usuario u = gerenciadorUsuario.validarLogin(nome, senha);
 
             if (u == null) {
-                // Credenciais inválidas
                 JOptionPane.showMessageDialog(
                     telaLogin,
                     "Usuário ou senha incorretos.",
@@ -82,36 +80,26 @@ public class LoginController {
                 return;
             }
 
-            // 3) Se chegou aqui, login OK. Define usuário atual no serviço
             gerenciadorUsuario.setUsuarioAtual(u);
 
-            // 4) Carrega a lista de categorias do banco e preenche o filtro
             List<Categoria> listaCategorias = new CategoriaDAO().buscarTodos();
             telaPrincipal.atualizarFiltroCategorias(listaCategorias);
 
-            // 5) Exibe saudação no canto (ou onde estiver na tela principal)
             telaPrincipal.setSaudacao("Olá, " + u.getNome() + "!");
 
-            // 6) Busca transações diretamente da entidade (já inicializada no DAO)
             List<Transacao> listaTransacoes = u.getHistoricoTransacoes();
-            // Caso prefira recarregar do BD, poderia usar:
-            // List<Transacao> listaTransacoes = gerenciadorFinanceiro.buscarTransacoesPorUsuario(u.getId());
             telaPrincipal.substituirTabelaTransacoes(listaTransacoes);
 
-            // 7) Exibe o saldo formatado
             DecimalFormat formatador = new DecimalFormat("R$ #,##0.00");
             String saldoFormatado = formatador.format(u.getSaldo());
             telaPrincipal.setSaldo(saldoFormatado);
 
-            // 8) Limpa campos da tela de login
             telaLogin.getUserInput().setText("");
             telaLogin.getPasswordInput().setText("");
 
-            // 9) Troca para a tela principal
             mainFrame.mostrarTela("principal");
 
         } catch (Exception ex) {
-            // Qualquer erro inesperado (conexão, DAO, etc.)
             JOptionPane.showMessageDialog(
                 telaLogin,
                 "Falha ao tentar entrar: " + ex.getMessage(),

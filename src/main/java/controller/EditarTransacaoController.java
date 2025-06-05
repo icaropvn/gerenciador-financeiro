@@ -79,11 +79,8 @@ public class EditarTransacaoController {
 		Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
 		
 		try {
-	        // CHAMADA NO SERVIÇO: ele já busca NOVAMENTE do BD
-	        // (não passe a instância “detached”, apenas o ID).
 	        Usuario usuarioAtualizado = gerenciadorFinanceiro.excluirTransacao(usuarioAtual.getId(), idTransacao);
 
-	        // Depois de excluir, recarregue a lista de transações na tela principal:
 	        telaPrincipal.removerTransacaoTabela(transacaoRemover);
 	        
 	        double novoSaldo = usuarioAtualizado.getSaldo();
@@ -165,11 +162,9 @@ public class EditarTransacaoController {
 			Transacao transacao = view.getTransacaoEmEdicao();
 			Usuario usuarioAtual = gerenciadorUsuario.getUsuarioAtual();
 			
-			// Guarda os valores antigos para ajuste do saldo
 			String classificacaoAntiga = transacao.getClassificacao();
 			double valorAntigo = transacao.getValor();
 			
-			// Atualiza os campos da transação
 			Categoria categoriaTransacao = gerenciadorCategorias.getInstanciaCategoria(categoriaSelecionada);
 			Date dataDate = (Date)view.getDataInput().getValue();
 			LocalDate dataTransacao = dataDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -180,14 +175,11 @@ public class EditarTransacaoController {
 			transacao.setCategoria(categoriaTransacao);
 			transacao.setClassificacao(classificacaoSelecionada);
 			
-			// Persiste a transação atualizada no banco
 			gerenciadorFinanceiro.atualizarTransacao(transacao);
 			
-			// Calcula o ajuste do saldo baseado nas mudanças
 			double ajusteSaldo = calcularAjusteSaldo(classificacaoAntiga, valorAntigo, 
 													classificacaoSelecionada, valorTransacaoDouble);
 			
-			// Aplica o ajuste ao saldo do usuário
 			if (ajusteSaldo != 0) {
 				if (ajusteSaldo > 0) {
 					gerenciadorFinanceiro.adicionarSaldo(usuarioAtual, ajusteSaldo);
@@ -196,10 +188,8 @@ public class EditarTransacaoController {
 				}
 			}
 			
-			// Atualiza a tabela na tela principal
 			telaPrincipal.atualizarTransacaoTabela(transacao);
 			
-			// Atualiza o saldo visualmente
 			DecimalFormat formatadorSaldo = new DecimalFormat("#,##0.00");
 			String novoSaldo = formatadorSaldo.format(usuarioAtual.getSaldo());
 			telaPrincipal.atualizarSaldo(novoSaldo);
@@ -219,25 +209,20 @@ public class EditarTransacaoController {
 		}
 	}
 	
-	/**
-	 * Calcula o ajuste necessário no saldo baseado nas mudanças na transação
-	 */
 	private double calcularAjusteSaldo(String classificacaoAntiga, double valorAntigo, 
 									  String classificacaoNova, double valorNovo) {
 		double ajuste = 0;
 		
-		// Primeiro, desfaz o efeito da transação antiga
 		if ("Receita".equalsIgnoreCase(classificacaoAntiga)) {
-			ajuste -= valorAntigo; // Remove a receita antiga
+			ajuste -= valorAntigo;
 		} else {
-			ajuste += valorAntigo; // Remove a despesa antiga (adiciona de volta ao saldo)
+			ajuste += valorAntigo;
 		}
 		
-		// Depois, aplica o efeito da transação nova
 		if ("Receita".equalsIgnoreCase(classificacaoNova)) {
-			ajuste += valorNovo; // Adiciona a nova receita
+			ajuste += valorNovo;
 		} else {
-			ajuste -= valorNovo; // Adiciona a nova despesa (subtrai do saldo)
+			ajuste -= valorNovo;
 		}
 		
 		return ajuste;

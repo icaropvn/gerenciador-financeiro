@@ -14,16 +14,10 @@ public class MainFrame extends JFrame {
 		cardLayout = new CardLayout();
 		cardPanel = new JPanel(cardLayout);
 		
-		/* aqui as telas serão instanciadas e adicionadas ao painel principal (cardPanel)
-		 * dessa forma poderemos apenas trocar a tela que está em exibição ao decorrer da execução
-		 */
-		
-		// instanciamento das telas
 		telaLogin = new TelaLogin();
 		telaCadastro = new TelaCadastro();
 		telaPrincipal = new TelaPrincipal();
 		
-		// adição das telas ao painel principal
 		cardPanel.add(telaLogin, "login");
 		cardPanel.add(telaCadastro, "cadastro");
 		cardPanel.add(telaPrincipal, "principal");
@@ -35,12 +29,10 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
-	// método para fazer a troca da tela em exibição
 	public void mostrarTela(String nomeTela) {
 		cardLayout.show(cardPanel, nomeTela);
 	}
 	
-	// getters e setters
 	public TelaLogin getTelaLogin() {
 		return telaLogin;
 	}

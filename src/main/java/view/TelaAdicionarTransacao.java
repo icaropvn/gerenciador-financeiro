@@ -142,6 +142,16 @@ public class TelaAdicionarTransacao extends JFrame {
 		add(painelRaiz);
 	}
 	
+	public void atualizarListaCategorias(List<Categoria> listaCategorias) {
+		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
+		modeloSelectCategoria.addElement("Categoria");
+		for(Categoria categoria : listaCategorias) {
+			modeloSelectCategoria.addElement(categoria.getDescricao());
+		}
+		
+		selectCategoria.setModel(modeloSelectCategoria);
+	}
+	
 	public JComboBox<String> getSelectClassificacao() {
 		return selectClassificacao;
 	}
@@ -168,15 +178,5 @@ public class TelaAdicionarTransacao extends JFrame {
 
 	public JButton getBotaoAdicionar() {
 		return botaoAdicionar;
-	}
-	
-	public void atualizarListaCategorias(List<Categoria> listaCategorias) {
-		DefaultComboBoxModel<String> modeloSelectCategoria = new DefaultComboBoxModel<>();
-		modeloSelectCategoria.addElement("Categoria");
-		for(Categoria categoria : listaCategorias) {
-			modeloSelectCategoria.addElement(categoria.getDescricao());
-		}
-		
-		selectCategoria.setModel(modeloSelectCategoria);
 	}
 }

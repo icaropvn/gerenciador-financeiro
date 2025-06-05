@@ -16,17 +16,9 @@ public class TelaEditarCategorias extends JFrame {
 	private static final long serialVersionUID = 1L;
 
     private MainFrame mainFrame;
-
-    // Painel que conterá as linhas de categorias
     private JPanel listaCategorias;
-
-    // Container principal
     private JScrollPane scrollPane;
-
-    // Campo de texto para digitar nova categoria
     private JTextField inputNomeCategoria;
-
-    // Botões
     private JButton botaoAdicionar;
     private JButton botaoVoltar;
 	
@@ -115,17 +107,12 @@ public class TelaEditarCategorias extends JFrame {
     }
 
     
-    public void inserirLinhaCategoria(Long idCategoria, String descricao,
-                                      ActionListener listenerEditar,
-                                      ActionListener listenerExcluir) {
-        // Painel horizontal para esta linha
+    public void inserirLinhaCategoria(Long idCategoria, String descricao, ActionListener listenerEditar, ActionListener listenerExcluir) {
         JPanel linha = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
-        // Label com o nome da categoria
         JLabel lbl = new JLabel(descricao);
         lbl.setName("lbl_" + idCategoria);
 
-        // Botões
         JButton btnEditar = new JButton("Editar");
         JButton btnExcluir = new JButton("Excluir");
 
@@ -136,7 +123,6 @@ public class TelaEditarCategorias extends JFrame {
         linha.add(btnEditar);
         linha.add(btnExcluir);
 
-        // Nomeamos a linha para podermos encontrá-la depois
         linha.setName("linha_" + idCategoria);
 
         listaCategorias.add(linha);
@@ -149,7 +135,6 @@ public class TelaEditarCategorias extends JFrame {
             if (comp instanceof JPanel) {
                 JPanel linha = (JPanel) comp;
                 if (("linha_" + idCategoria).equals(linha.getName())) {
-                    // Dentro dessa linha, o primeiro (índice 0) é sempre o JLabel
                     Component c0 = linha.getComponent(0);
                     if (c0 instanceof JLabel) {
                         ((JLabel) c0).setText(novaDescricao);

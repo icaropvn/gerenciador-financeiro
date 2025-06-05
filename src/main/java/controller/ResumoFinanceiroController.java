@@ -21,9 +21,7 @@ public class ResumoFinanceiroController {
     private final GerenciadorFinanceiro gerenciadorFinanceiro;
     private final GerenciadorUsuario gerenciadorUsuario;
 
-    // Formato de data esperado nos campos de texto
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    // Formatador numérico para exibir valores monetários
     private static final DecimalFormat DF;
 
     static {
@@ -48,7 +46,6 @@ public class ResumoFinanceiroController {
     }
 
     private void initController() {
-        // 1) Ao abrir a janela, popular o combo de categorias com dados do banco:
         List<String> descricoes = gerenciadorCategorias.listarCategorias()
             .stream()
             .map(c -> c.getDescricao())
@@ -59,13 +56,10 @@ public class ResumoFinanceiroController {
             view.getSelectCategoria().addItem(desc);
         }
 
-        // 2) Registrar listener do botão “Aplicar Filtros”
         view.getBotaoAplicarFiltros().addActionListener(e -> aplicarFiltros());
 
-        // 3) Registrar listener do botão “Limpar Filtros”
         view.getBotaoLimparFiltros().addActionListener(e -> view.limparFiltros());
 
-        // 4) Registrar listener do botão “Voltar”
         view.getBotaoVoltar().addActionListener(e -> {
             view.limparFiltros();
             view.dispose();
@@ -74,14 +68,12 @@ public class ResumoFinanceiroController {
 
     private void aplicarFiltros() {
         try {
-            // 1) Lê texto dos campos de data
             String textoInicio = view.getInputDataInicial().getText().trim();
             String textoFim    = view.getInputDataFinal().getText().trim();
 
             LocalDate dataInicio = null;
             LocalDate dataFim    = null;
 
-            // 2) Converte data início, se informado
             if (!textoInicio.isEmpty()) {
                 try {
                     dataInicio = LocalDate.parse(textoInicio, FORMATTER);
@@ -96,7 +88,6 @@ public class ResumoFinanceiroController {
                 }
             }
 
-            // 3) Converte data fim, se informado
             if (!textoFim.isEmpty()) {
                 try {
                     dataFim = LocalDate.parse(textoFim, FORMATTER);
@@ -111,7 +102,6 @@ public class ResumoFinanceiroController {
                 }
             }
 
-            // 4) Se ambas preenchidas, valida ordem
             if (dataInicio != null && dataFim != null && dataInicio.isAfter(dataFim)) {
                 JOptionPane.showMessageDialog(
                     view,
@@ -122,41 +112,34 @@ public class ResumoFinanceiroController {
                 return;
             }
 
-            // 5) Lê classificação e categoria selecionadas
             String classificacaoSelecionada = (String) view.getSelectClassificacao().getSelectedItem();
             String categoriaSelecionada     = (String) view.getSelectCategoria().getSelectedItem();
 
-            // 6) Busca todas as transações do usuário atual
             Long usuarioId = gerenciadorUsuario.getUsuarioAtual().getId();
             List<Transacao> todasTransacoes = gerenciadorFinanceiro.buscarTransacoesPorUsuario(usuarioId);
 
-            // 7) Filtrar passo a passo, ignorando critérios não informados:
-            final LocalDate fi = dataInicio; // variáveis final para lambda
+            final LocalDate fi = dataInicio;
             final LocalDate ff = dataFim;
 
             List<Transacao> filtradas = todasTransacoes.stream()
-                // Filtrar por data início
                 .filter(t -> {
                     if (fi != null) {
                         return !t.getData().isBefore(fi);
                     }
                     return true;
                 })
-                // Filtrar por data fim
                 .filter(t -> {
                     if (ff != null) {
                         return !t.getData().isAfter(ff);
                     }
                     return true;
                 })
-                // Filtrar por classificação
                 .filter(t -> {
                     if (!"Classificação".equals(classificacaoSelecionada)) {
                         return classificacaoSelecionada.equalsIgnoreCase(t.getClassificacao());
                     }
                     return true;
                 })
-                // Filtrar por categoria
                 .filter(t -> {
                     if (!"Categoria".equals(categoriaSelecionada)) {
                         return categoriaSelecionada.equalsIgnoreCase(t.getCategoria().getDescricao());
@@ -165,12 +148,10 @@ public class ResumoFinanceiroController {
                 })
                 .toList();
 
-            // 8) Calcular totais
             double totalReceitas = gerenciadorFinanceiro.calcularTotalReceitas(filtradas);
             double totalDespesas = gerenciadorFinanceiro.calcularTotalDespesas(filtradas);
             double saldoFinal    = totalReceitas - totalDespesas;
 
-            // 9) Montar texto de período (“dd/MM/yyyy - dd/MM/yyyy” ou caso apenas uma data)
             String periodoTexto;
             if (fi == null && ff == null) {
                 periodoTexto = "Todos os períodos";
@@ -182,13 +163,11 @@ public class ResumoFinanceiroController {
                 periodoTexto = textoInicio + " - " + textoFim;
             }
 
-            // 10) Montar texto de classificação e categoria
             String textoClassificacao = 
                 ("Classificação".equals(classificacaoSelecionada) ? "Todas" : classificacaoSelecionada);
             String textoCategoria = 
                 ("Categoria".equals(categoriaSelecionada) ? "Todas" : categoriaSelecionada);
 
-            // 11) Exibir nos labels da view
             view.setPeriodoAnalisado(periodoTexto);
             view.setClassificacao(textoClassificacao);
             view.setCategoria(textoCategoria);

@@ -21,9 +21,7 @@ public class CadastroController {
     }
 
     private void initController() {
-        // Listener para o botão “Voltar”
         telaCadastro.getBotaoVoltar().addActionListener(e -> {
-            // Limpa campos ao voltar
             telaCadastro.getUserInput().setText("");
             telaCadastro.getIncomeInput().setText("");
             telaCadastro.getPasswordInput().setText("");
@@ -31,7 +29,6 @@ public class CadastroController {
             mainFrame.mostrarTela("login");
         });
 
-        // Listener para o botão “Registrar”
         telaCadastro.getRegisterButton().addActionListener(e -> validarCadastro());
     }
 
@@ -41,7 +38,6 @@ public class CadastroController {
         String senha = telaCadastro.getPasswordInput().getText().trim();
         String confirmarSenha = telaCadastro.getConfirmPasswordInput().getText().trim();
 
-        // 1) Verifica se todos os campos foram preenchidos
         if (nome.isEmpty() || salarioString.isEmpty() || senha.isEmpty() || confirmarSenha.isEmpty()) {
             JOptionPane.showMessageDialog(
                 telaCadastro,
@@ -52,7 +48,6 @@ public class CadastroController {
             return;
         }
 
-        // 2) Verifica se usuário já existe
         if (gerenciadorUsuario.buscarPorNome(nome) != null) {
             JOptionPane.showMessageDialog(
                 telaCadastro,
@@ -63,7 +58,6 @@ public class CadastroController {
             return;
         }
 
-        // 3) Verifica tamanho mínimo da senha (por exemplo, 6 caracteres)
         if (senha.length() < 6) {
             JOptionPane.showMessageDialog(
                 telaCadastro,
@@ -74,7 +68,6 @@ public class CadastroController {
             return;
         }
 
-        // 4) Verifica se senha e confirmar senha coincidem
         if (!senha.equals(confirmarSenha)) {
             JOptionPane.showMessageDialog(
                 telaCadastro,
@@ -85,7 +78,6 @@ public class CadastroController {
             return;
         }
 
-        // 5) Converte salário para double (tratando possível NumberFormatException)
         double salarioDouble;
         try {
             salarioDouble = Double.parseDouble(salarioString.replace(",", "."));
@@ -108,21 +100,16 @@ public class CadastroController {
             return;
         }
 
-        // 6) Criptografa a senha
         String senhaCriptografada = CriptografarSenha.criptografarSenha(senha);
 
-        // 7) Tenta persistir o usuário no banco
         try {
             Usuario novoUsuario = gerenciadorUsuario.adicionarUsuario(nome, senhaCriptografada, salarioDouble);
 
-            // 8) Se chegou aqui, foi cadastrado com sucesso.
-            // Limpa todos os campos da tela de cadastro
             telaCadastro.getUserInput().setText("");
             telaCadastro.getIncomeInput().setText("");
             telaCadastro.getPasswordInput().setText("");
             telaCadastro.getConfirmPasswordInput().setText("");
 
-            // Retorna para a tela de login
             mainFrame.mostrarTela("login");
             JOptionPane.showMessageDialog(
                 mainFrame,
@@ -133,7 +120,6 @@ public class CadastroController {
             
             DebugDatabasePrinter.imprimirTodasTabelas();
         } catch (Exception ex) {
-            // Caso o DAO ou alguma restrição dispare erro, exibimos
             JOptionPane.showMessageDialog(
                 telaCadastro,
                 "Erro ao cadastrar usuário: " + ex.getMessage(),
